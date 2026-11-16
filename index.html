@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sayso — learn a language by actually talking</title>
+<meta name="description" content="Learn 8 languages through real conversations, script lessons and gentle, guilt-free practice.">
+<meta name="theme-color" content="#FF6B4A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sayso">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF7EE;--ink:#1F1B2E;--mut:#7A7287;--line:#EADFD3;--coral:#FF6B4A;--coralD:#D9492B;--vio:#6C5CE7;--vioD:#4E3FC4;--vioL:#EFECFF;--good:#22A866;--goodD:#17824D;--goodL:#DDF6E8;--bad:#E5484D;--badD:#B8323A;--badL:#FDE4E4;--gold:#FFB703;--goldD:#D99500}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,sans-serif}
+#app{max-width:480px;margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden;background:var(--bg)}
+h1,h2,h3{font-family:Fredoka,Nunito,sans-serif;font-weight:600;line-height:1.15}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+.mut{color:var(--mut);font-weight:700;line-height:1.4}
+
+/* top + tabs */
+.top{display:flex;align-items:center;gap:8px;padding:calc(12px + env(safe-area-inset-top)) 16px 10px;border-bottom:2px solid var(--line)}
+.logo{display:flex;align-items:center;gap:7px;font-family:Fredoka;font-weight:700;font-size:22px;color:var(--coral);flex:1}
+.logo svg{width:30px}
+.chip{display:flex;align-items:center;gap:4px;font-weight:900;font-size:15px;padding:5px 9px;border-radius:12px;background:#fff;border:2px solid var(--line)}
+.ring{width:38px;height:38px;position:relative;display:grid;place-items:center;font-size:15px}
+.ring svg{position:absolute;inset:0}
+.scroll{flex:1;overflow-y:auto;padding:18px 16px 30px}
+.tabs{display:flex;border-top:2px solid var(--line);background:#fff;padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px;border-radius:14px;font-weight:900;font-size:12px;color:var(--mut);position:relative}
+.tabs button.on{color:var(--coral);background:#FFF0EB}
+.tabs .ic{font-size:22px}
+.badge{position:absolute;top:2px;left:calc(50% + 6px);background:var(--bad);color:#fff;font-size:11px;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 5px}
+
+/* buttons */
+.btn{display:block;width:100%;padding:14px 18px;border-radius:16px;font-weight:900;font-size:16px;letter-spacing:.5px;text-transform:uppercase;transition:transform .06s,box-shadow .06s}
+.btn:active:not(:disabled){transform:translateY(4px)}
+.btn.pri{background:var(--coral);color:#fff;box-shadow:0 5px 0 var(--coralD)}
+.btn.pri:active:not(:disabled){box-shadow:0 1px 0 var(--coralD)}
+.btn.good{background:var(--good);color:#fff;box-shadow:0 5px 0 var(--goodD)}
+.btn.bad{background:var(--bad);color:#fff;box-shadow:0 5px 0 var(--badD)}
+.btn.ghost{background:#fff;color:var(--vio);border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.btn:disabled{background:#E7E1DA;color:#AFA6B8;box-shadow:0 5px 0 #D4CCC3;cursor:default}
+
+/* learn */
+.unit{background:var(--vio);color:#fff;border-radius:20px;padding:14px 16px;box-shadow:0 5px 0 var(--vioD);display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.unit svg{width:52px;flex:none}
+.unit small{opacity:.85;font-weight:900;text-transform:uppercase;font-size:11.5px;letter-spacing:1px}
+.unit h3{font-size:20px;margin-top:2px}
+.goal{background:#fff;border:2px solid var(--line);border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px;margin-bottom:28px}
+.gbar{flex:1;height:12px;background:#EDE5DC;border-radius:8px;overflow:hidden}
+.gbar i{display:block;height:100%;background:var(--gold);border-radius:8px}
+.path{display:flex;flex-direction:column;align-items:center;gap:30px;padding:24px 0 10px}
+.nodewrap{display:flex;flex-direction:column;align-items:center;gap:8px;transform:translateX(var(--off))}
+.node{position:relative;width:78px;height:72px;border-radius:50%;font-size:32px;display:grid;place-items:center;background:var(--c);box-shadow:0 7px 0 color-mix(in srgb,var(--c) 68%,#000)}
+.node:active{transform:translateY(5px);box-shadow:0 2px 0 color-mix(in srgb,var(--c) 68%,#000)}
+.node.locked{--c:#DDD5CC !important;filter:grayscale(1);opacity:.75}
+.node.done::after{content:'✓';position:absolute;right:-5px;bottom:-5px;background:var(--gold);color:#fff;width:28px;height:28px;border-radius:50%;font-size:15px;font-weight:900;display:grid;place-items:center;border:3px solid var(--bg)}
+.node.cur{animation:bob 1.6s ease-in-out infinite}
+.start{position:absolute;top:-40px;left:50%;transform:translateX(-50%);background:#fff;border:2px solid var(--line);color:var(--coral);font-weight:900;font-size:13px;padding:5px 11px;border-radius:10px;white-space:nowrap;font-family:Nunito}
+.nlabel{font-weight:900;font-size:13px;color:var(--mut)}
+.more{text-align:center;margin-top:34px;padding:16px;border:2px dashed var(--line);border-radius:18px}
+
+/* cards */
+.card{background:#fff;border:2px solid var(--line);border-radius:20px;padding:16px;margin-bottom:14px;box-shadow:0 4px 0 var(--line)}
+.card h3{font-size:19px;margin-bottom:8px}
+.card .btn{margin-top:14px}
+.feat{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:2px dashed var(--line)}
+.feat:first-of-type{border-top:none}
+.feat .fi{font-size:26px;width:36px;text-align:center;flex:none}
+.feat b{display:block;font-size:15.5px}
+.feat p{color:var(--mut);font-size:14px;line-height:1.4;font-weight:700}
+.weak{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:2px dashed var(--line);font-weight:800;font-size:15px}
+.dots{flex:none}
+.dots i{display:inline-block;width:9px;height:9px;border-radius:50%;background:#E7E1DA;margin-left:3px}
+.dots i.on{background:var(--good)}
+
+/* lesson */
+.lesson{display:flex;flex-direction:column;height:100%}
+.lbar{display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top)) 16px 6px}
+.x{font-size:22px;color:var(--mut);padding:4px 6px;font-weight:900}
+.prog{flex:1;height:16px;background:#EDE5DC;border-radius:10px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--good);border-radius:10px;transition:width .4s;box-shadow:inset 0 4px 0 rgba(255,255,255,.3)}
+.combo{font-weight:900;color:#C9C0B6;font-size:15px;min-width:42px;text-align:right}
+.combo.on{color:var(--coral);animation:pop .3s}
+.ex{flex:1;overflow-y:auto;padding:14px 18px 20px}
+.ex h2{font-size:24px;margin:4px 0 18px}
+.grid.pics{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid.list{display:flex;flex-direction:column;gap:10px}
+.opt{background:#fff;border:2px solid var(--line);border-radius:16px;box-shadow:0 4px 0 var(--line);padding:14px 16px;font-weight:800;font-size:17px;text-align:left;display:flex;align-items:center;gap:10px}
+.pics .opt{flex-direction:column;justify-content:center;padding:18px 10px;text-align:center}
+.em{font-size:46px;line-height:1}
+.opt.sel{border-color:var(--vio);background:var(--vioL);box-shadow:0 4px 0 var(--vio);color:var(--vioD)}
+.opt.right{border-color:var(--good);background:var(--goodL);box-shadow:0 4px 0 var(--good);color:var(--goodD)}
+.opt.wrong{border-color:var(--bad);background:var(--badL);box-shadow:0 4px 0 var(--bad);color:var(--badD)}
+.speak{display:flex;justify-content:center;align-items:flex-end;gap:14px;margin:6px 0 26px}
+.speak .big{width:100px;height:100px;border-radius:26px;background:var(--vio);box-shadow:0 6px 0 var(--vioD);font-size:44px}
+.speak .slow{width:64px;height:64px;border-radius:18px;background:var(--vioL);box-shadow:0 5px 0 #CFC8FA;font-size:28px}
+.srcrow{display:flex;gap:10px;align-items:center;margin-bottom:22px}
+.srcrow svg{width:66px;flex:none}
+.bubble{background:#fff;border:2px solid var(--line);border-radius:16px;padding:12px 14px;font-weight:800;font-size:18px;display:flex;align-items:center;gap:8px}
+.bubble button{font-size:18px}
+.answer{min-height:120px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:8px;padding:10px;margin-bottom:22px;border:2px dashed var(--line);border-radius:16px}
+.bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tok{background:#fff;border:2px solid var(--line);box-shadow:0 3px 0 var(--line);border-radius:12px;padding:9px 13px;font-weight:800;font-size:17px;min-height:46px}
+.tok.ghost{background:#EDE5DC;color:transparent;box-shadow:none;border-color:#EDE5DC}
+.tok.ghost .rom{visibility:hidden}
+.answer.right .tok{border-color:var(--good);color:var(--goodD)}
+.answer.wrong .tok{border-color:var(--bad);color:var(--badD)}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.match>div{display:flex;flex-direction:column;gap:10px}
+.mt{width:100%;height:auto;padding:15px 8px;text-align:center}
+.mt.sel{border-color:var(--vio);background:var(--vioL);box-shadow:0 3px 0 var(--vio)}
+.mt.gone{opacity:.4;box-shadow:none;pointer-events:none;border-color:var(--good);background:var(--goodL)}
+.mt.err{border-color:var(--bad);background:var(--badL);animation:shake .3s}
+.foot{padding:14px 18px calc(18px + env(safe-area-inset-bottom));border-top:2px solid var(--line);transition:background .2s}
+.foot.good{background:var(--goodL);border-color:transparent}
+.foot.bad{background:var(--badL);border-color:transparent}
+.fbt{font-family:Fredoka;font-weight:600;font-size:22px;display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.foot.good .fbt{color:var(--goodD)}
+.foot.bad .fbt{color:var(--badD)}
+.foot p{font-size:15px;margin-bottom:8px;line-height:1.4;font-weight:700}
+.why{background:rgba(255,255,255,.75);border-radius:12px;padding:10px 12px;font-size:14.5px;margin:6px 0 12px;line-height:1.45;font-weight:700}
+.saved{font-size:13.5px !important;color:var(--badD)}
+.x2{background:var(--coral);color:#fff;font-size:12px;font-family:Nunito;font-weight:900;padding:3px 8px;border-radius:8px}
+
+/* convo */
+.convo-head{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.av{width:50px;height:50px;border-radius:50%;background:#FFE3D9;display:grid;place-items:center;font-size:28px;flex:none}
+.convo-head b{font-family:Fredoka;font-size:19px;font-weight:600}
+.convo-head small{display:block;color:var(--mut);font-weight:800;font-size:13px}
+.tapt{font-size:12.5px;color:var(--mut);font-weight:800;margin:6px 0 14px}
+.chat{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.b{max-width:84%;padding:10px 14px;border-radius:18px;font-weight:800;font-size:16.5px;line-height:1.35;animation:pop .25s}
+.b.npc{align-self:flex-start;background:#fff;border:2px solid var(--line);border-bottom-left-radius:6px;cursor:pointer}
+.b.npc small.en{display:none;color:var(--mut);font-weight:700;font-size:14px;margin-top:4px}
+.b.npc.show small.en{display:block}
+.b.npc .sp{margin-left:4px;font-size:15px}
+.b.me{align-self:flex-end;background:var(--vio);color:#fff;border-bottom-right-radius:6px}
+.replies{display:flex;flex-direction:column;gap:9px}
+.reply{font-size:16px;padding:12px 14px}
+.reply.bad{border-color:var(--bad);background:var(--badL);box-shadow:0 4px 0 var(--bad);animation:shake .3s}
+.hint{margin-top:12px;background:#FFF4D6;border:2px solid #FFE3A1;border-radius:14px;padding:10px 12px;font-weight:800;font-size:14.5px;line-height:1.4}
+
+/* finish */
+.finish{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;gap:8px;overflow-y:auto}
+.finish svg.m{width:130px;animation:bob 1.6s ease-in-out infinite;margin-bottom:6px}
+.finish h1{font-size:32px;color:var(--coral)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin:16px 0}
+.stat{border-radius:16px;border:2px solid var(--c);overflow:hidden;background:#fff}
+.stat b{display:block;background:var(--c);color:#fff;font-size:11.5px;text-transform:uppercase;letter-spacing:1px;padding:4px;font-weight:900}
+.stat span{display:block;font-family:Fredoka;font-size:25px;font-weight:600;padding:10px;color:var(--ink)}
+
+/* overlays */
+.ov{position:absolute;inset:0;background:rgba(31,27,46,.45);display:flex;align-items:flex-end;z-index:20;animation:fade .2s}
+.sheet{background:#fff;width:100%;border-radius:26px 26px 0 0;padding:24px 18px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;text-align:center;animation:up .25s}
+.sheet h2{font-size:24px}
+.bigem{width:84px;height:84px;border-radius:50%;margin:0 auto 4px;display:grid;place-items:center;font-size:40px}
+.pills{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:6px}
+.pills span{background:var(--vioL);color:var(--vioD);font-weight:800;font-size:13.5px;padding:5px 10px;border-radius:10px}
+.toast{position:absolute;top:76px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:12px;font-weight:800;font-size:14px;z-index:30;animation:pop .2s;white-space:nowrap}
+.cf{position:absolute;top:-16px;width:9px;height:14px;border-radius:2px;z-index:25;animation:fall var(--d) cubic-bezier(.3,.6,.6,1) forwards;pointer-events:none}
+
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes pop{0%{transform:scale(.85);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes fade{from{opacity:0}}
+@keyframes up{from{transform:translateY(100%)}}
+@keyframes fall{to{transform:translate(var(--x),105vh) rotate(var(--r))}}
+.toast{transform:translateX(-50%)}
+.sheet{max-height:88%;overflow-y:auto}
+.welcome{flex:1;overflow-y:auto;padding:calc(40px + env(safe-area-inset-top)) 20px 30px;text-align:center}
+.welcome .wm{width:120px;animation:bob 1.6s ease-in-out infinite}
+.welcome h1{font-size:30px;color:var(--coral);margin:8px 0 4px}
+.langs{display:flex;flex-direction:column;gap:10px;margin-top:16px;text-align:left}
+.lang{display:flex;align-items:center;gap:14px;width:100%;background:#fff;border:2px solid var(--line);border-radius:18px;box-shadow:0 4px 0 var(--line);padding:12px 16px;text-align:left}
+.lang .fl{font-size:36px;line-height:1}
+.lang b{font-family:Fredoka;font-size:19px;font-weight:600;display:block}
+.lang small{color:var(--mut);font-weight:800;font-size:13.5px}
+.lang.on{border-color:var(--vio);box-shadow:0 4px 0 var(--vio);background:var(--vioL)}
+.lang .tick{color:var(--vio);font-weight:900;font-size:20px}
+.lang.soon{opacity:.5;box-shadow:none;border-style:dashed}
+.top .chip{padding:5px 8px}
+
+.tl{display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.2;vertical-align:middle}
+.rom{font-size:.66em;font-weight:700;color:var(--mut);margin-top:2px;letter-spacing:.1px}
+.pics .opt .tl,.tok .tl,.mt .tl{align-items:center}
+.b.me .rom{color:#DCD6FF}
+.opt.sel .rom{color:var(--vio)}
+.pills .rom{font-size:.8em}
+.romt{font-weight:900;font-size:13px;padding:4px 8px;border-radius:9px;border:2px solid var(--line);color:var(--mut);background:#fff}
+.romt.on{border-color:var(--vio);color:var(--vio);background:var(--vioL)}
+.lc{font-size:11px;font-weight:900;color:var(--mut);margin-left:2px}
+.lgroup{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--mut);margin:10px 4px 0}
+.lgroup:first-child{margin-top:0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ---------- content ---------- */
+const COURSES = {
+es:{ name:'Spanish', flag:'🇪🇸', voice:'es-ES', hello:'¡Hola!', unit:'Survive your first trip', group:'European languages', lessons:[
+{ id:'greet', title:'First Hellos', emoji:'👋', color:'#FF6B4A',
+  desc:'Say hi, introduce yourself, and finish with a real chat with Lucía at a hostel.',
+  words:['hola','buenos días','¿cómo estás?','me llamo','gracias'],
+  ex:[
+  {t:'choice', prompt:'Which one means “hello”?', options:[{e:'👋',w:'hola'},{e:'🚪',w:'adiós'},{e:'🙏',w:'gracias'},{e:'🥺',w:'por favor'}], answer:0,
+   tip:'“Hola” works any time of day, with friends or strangers. The h is silent: “OH-la”.'},
+  {t:'listen', say:'Buenos días', options:['Good morning','Good night','Good afternoon'], answer:0,
+   tip:'Greetings are plural in Spanish: buenos días (morning), buenas tardes (afternoon), buenas noches (night).'},
+  {t:'build', src:'Good night, Ana', answer:'Buenas noches, Ana', extra:['días','Buenos'],
+   tip:'“Noche” is feminine, so it takes “buenas”, not “buenos”.'},
+  {t:'match', pairs:[['hola','hello'],['adiós','goodbye'],['gracias','thank you'],['por favor','please'],['sí','yes']]},
+  {t:'choice', prompt:'What does this mean?', es:'¿Cómo estás?', options:['How are you?','Where are you?','Who are you?'], answer:0,
+   tip:'cómo = how, estás = you are. Notice the upside-down ¿ that opens every question.'},
+  {t:'build', src:'I am well, thanks', answer:'Estoy bien, gracias', extra:['Soy','mal'],
+   tip:'Use estar (estoy) for how you feel right now. Ser (soy) is for permanent things like where you are from.'},
+  {t:'convo', npc:'Lucía', npcEmoji:'👩🏽', scene:'Meeting someone at a hostel',
+   tip:'You just held your first real conversation in Spanish!',
+   turns:[
+    {npc:'¡Hola! Me llamo Lucía. ¿Cómo te llamas?', en:'Hi! I’m Lucía. What’s your name?', choices:[
+      {es:'Tengo veinte años.', fb:'That means “I’m 20 years old”. She asked your name. Try “Me llamo…”.'},
+      {es:'Me llamo Alex.', ok:true},
+      {es:'Adiós, Lucía.', fb:'You just said goodbye before saying hello! 😄'}]},
+    {npc:'¡Mucho gusto, Alex! ¿Cómo estás?', en:'Nice to meet you, Alex! How are you?', choices:[
+      {es:'Muy bien, ¿y tú?', ok:true},
+      {es:'Me llamo bien.', fb:'“Me llamo” is only for names. For how you feel, use “estoy” or just “bien”.'}]},
+    {npc:'¡Genial! Bueno, hasta luego.', en:'Great! Well, see you later.', choices:[
+      {es:'¿Cómo te llamas?', fb:'You already know her name: Lucía!'},
+      {es:'¡Hasta luego!', ok:true}]}
+   ]}
+  ]},
+{ id:'cafe', title:'At the Café', emoji:'☕', color:'#C0763A',
+  desc:'Order like a local, ask the price, and pay. Ends with ordering from Marta the barista.',
+  words:['un café','con leche','para llevar','la cuenta','¿cuánto cuesta?'],
+  ex:[
+  {t:'choice', prompt:'Which one is “coffee”?', options:[{e:'💧',w:'el agua'},{e:'☕',w:'el café'},{e:'🥐',w:'el cruasán'},{e:'🍵',w:'el té'}], answer:1,
+   tip:'“Café” means both the drink and the place. Stress the last syllable: ca-FÉ.'},
+  {t:'listen', say:'Un agua, por favor', options:['A coffee, please','A water, please','The bill, please'], answer:1,
+   tip:'“Agua” is feminine, but it uses “un/el” in the singular because it starts with a stressed “a”.'},
+  {t:'build', src:'A coffee with milk, please', answer:'Un café con leche, por favor', extra:['té','sin'],
+   tip:'con = with, sin = without. A “café con leche” is the classic Spanish breakfast coffee.'},
+  {t:'match', pairs:[['café','coffee'],['leche','milk'],['té','tea'],['la cuenta','the bill'],['agua','water']]},
+  {t:'choice', prompt:'What does this mean?', es:'¿Cuánto cuesta?', options:['What time is it?','How much does it cost?','How many are there?'], answer:1,
+   tip:'cuánto = how much. For more than one thing, say “¿Cuánto cuestan?”.'},
+  {t:'listen', say:'La cuenta, por favor', options:['The menu, please','The table, please','The bill, please'], answer:2,
+   tip:'In Spain, waiters usually won’t bring the bill until you ask. “La cuenta, por favor” is the magic phrase.'},
+  {t:'convo', npc:'Marta', npcEmoji:'👩🏻‍🍳', scene:'Ordering at a café in Madrid',
+   tip:'Order placed and paid, all in Spanish. ☕',
+   turns:[
+    {npc:'¡Buenas! ¿Qué te pongo?', en:'Hi! What can I get you?', choices:[
+      {es:'Estoy bien, gracias.', fb:'That answers “how are you?”. She wants your order!'},
+      {es:'La cuenta, por favor.', fb:'You haven’t ordered yet. That asks for the bill.'},
+      {es:'Un café con leche, por favor.', ok:true}]},
+    {npc:'¿Para tomar aquí o para llevar?', en:'For here or to go?', choices:[
+      {es:'Con leche.', fb:'She asked “here or to go?”. “Para llevar” means to go.'},
+      {es:'Para llevar, por favor.', ok:true}]},
+    {npc:'Perfecto. Son dos euros.', en:'Perfect. That’s two euros.', choices:[
+      {es:'Aquí tienes. ¡Gracias!', ok:true},
+      {es:'¿Cómo te llamas?', fb:'Maybe not the moment to ask her name. 😅 Pay first!'}]}
+   ]}
+  ]},
+{ id:'around', title:'Getting Around', emoji:'🧭', color:'#2A9D8F',
+  desc:'Ask where things are and understand directions. Ends with asking a stranger for help.',
+  words:['¿dónde está…?','izquierda','derecha','todo recto','cerca'],
+  ex:[
+  {t:'choice', prompt:'Which one is “the station”?', options:[{e:'🏨',w:'el hotel'},{e:'🏖️',w:'la playa'},{e:'🚉',w:'la estación'},{e:'🏥',w:'el hospital'}], answer:2,
+   tip:'Words ending in -ción are almost always feminine: la estación, la información.'},
+  {t:'choice', prompt:'What does this mean?', es:'¿Dónde está el baño?', options:['Is this the bathroom?','Where is the bathroom?','When is the bathroom open?'], answer:1,
+   tip:'dónde = where. Location always uses estar: “¿Dónde está…?”.'},
+  {t:'build', src:'Turn left', answer:'Gira a la izquierda', extra:['derecha','recto'],
+   tip:'izquierda = left, derecha = right. Memory trick: derecha sounds like “direct”, and right is the “correct” side.'},
+  {t:'listen', say:'Todo recto', options:['On the right','Straight ahead','Behind you'], answer:1,
+   tip:'“Todo recto” (Spain) or “derecho” (Latin America) both mean straight ahead.'},
+  {t:'match', pairs:[['izquierda','left'],['derecha','right'],['cerca','near'],['lejos','far'],['aquí','here']]},
+  {t:'build', src:'Is it far?', answer:'¿Está lejos?', extra:['cerca','Es'],
+   tip:'Location uses estar, so it’s “¿Está lejos?”, never “¿Es lejos?”.'},
+  {t:'convo', npc:'Javier', npcEmoji:'🧔🏽', scene:'Lost near Plaza Mayor',
+   tip:'You found your way without opening a map app. 🧭',
+   turns:[
+    {npc:'Hola, ¿te puedo ayudar?', en:'Hi, can I help you?', choices:[
+      {es:'Sí, ¿dónde está la estación?', ok:true},
+      {es:'Un café, por favor.', fb:'He’s a helpful stranger, not a barista! ☕'}]},
+    {npc:'Sigue todo recto y gira a la derecha.', en:'Go straight ahead and turn right.', choices:[
+      {es:'¿Cómo estás?', fb:'Ask about the directions instead: is it far?'},
+      {es:'¿Está lejos?', ok:true}]},
+    {npc:'No, está muy cerca. Cinco minutos.', en:'No, it’s really close. Five minutes.', choices:[
+      {es:'Gira a la izquierda.', fb:'Now you’re giving him directions! Just thank him.'},
+      {es:'¡Muchas gracias!', ok:true}]}
+   ]}
+  ]},
+{ id:'friends', title:'Making Friends', emoji:'🎉', color:'#E76FAE',
+  desc:'Talk about where you’re from and what you like. Ends with making weekend plans.',
+  words:['soy de…','me gusta','¿quieres…?','la playa','el amigo'],
+  ex:[
+  {t:'choice', prompt:'Which one is “friend”?', options:[{e:'🐶',w:'el perro'},{e:'🧑‍🤝‍🧑',w:'el amigo'},{e:'🏠',w:'la casa'},{e:'📚',w:'el libro'}], answer:1,
+   tip:'el amigo (male friend), la amiga (female friend), los amigos (friends).'},
+  {t:'build', src:'I like music', answer:'Me gusta la música', extra:['Yo','gustan'],
+   tip:'Literally “music pleases me”. With plural things, use gustan: “me gustan los libros”.'},
+  {t:'listen', say:'¿De dónde eres?', options:['Where are you going?','Where do you live?','Where are you from?'], answer:2,
+   tip:'Origin is permanent, so it uses ser: “¿De dónde eres?” “Soy de…”'},
+  {t:'match', pairs:[['perro','dog'],['gato','cat'],['música','music'],['libro','book'],['playa','beach']]},
+  {t:'choice', prompt:'How do you say “I’m from Australia”?', options:['Estoy de Australia','Soy de Australia','Me llamo Australia'], answer:1,
+   tip:'Where you’re from doesn’t change, so it’s ser: “Soy de…”.'},
+  {t:'build', src:'Do you want to go to the beach?', answer:'¿Quieres ir a la playa?', extra:['casa','Quiero'],
+   tip:'quieres = you want, quiero = I want. Add any place after “ir a…”.'},
+  {t:'convo', npc:'Diego', npcEmoji:'🧑🏽‍🦱', scene:'At a friend’s party',
+   tip:'New friend unlocked. Beach on Saturday! 🏖️',
+   turns:[
+    {npc:'¡Hola! ¿De dónde eres?', en:'Hi! Where are you from?', choices:[
+      {es:'Estoy de Australia.', fb:'Close! Origin uses ser, so say “Soy de…”.'},
+      {es:'Soy de Australia. ¿Y tú?', ok:true}]},
+    {npc:'Soy de México. ¿Qué te gusta hacer?', en:'I’m from Mexico. What do you like to do?', choices:[
+      {es:'Me gusta la música y la playa.', ok:true},
+      {es:'Me gustan la música.', fb:'“Música” is singular, so it’s “me gusta”.'}]},
+    {npc:'¡A mí también! ¿Quieres ir a la playa el sábado?', en:'Me too! Want to go to the beach on Saturday?', choices:[
+      {es:'La cuenta, por favor.', fb:'Ha, wrong scene! He’s inviting you to the beach.'},
+      {es:'¡Sí, claro!', ok:true}]}
+   ]}
+  ]}
+]},
+
+fr:{ name:'French', flag:'🇫🇷', voice:'fr-FR', hello:'Bonjour !', unit:'Survive your first trip', group:'European languages', lessons:[
+{ id:'greet', title:'First Hellos', emoji:'👋', color:'#FF6B4A',
+  desc:'Say hi, introduce yourself, and finish with a real chat with Camille at a hostel in Lyon.',
+  words:['bonjour','bonsoir','ça va ?','je m’appelle','merci'],
+  ex:[
+  {t:'choice', prompt:'Which one means “hello”?', options:[{e:'👋',w:'bonjour'},{e:'🚪',w:'au revoir'},{e:'🙏',w:'merci'},{e:'🥺',w:'s’il vous plaît'}], answer:0,
+   tip:'In France, always say “bonjour” when you walk into a shop. Skipping it comes across as rude.'},
+  {t:'listen', say:'Bonsoir', options:['Good evening','Good morning','Goodbye'], answer:0,
+   tip:'Use “bonjour” during the day and switch to “bonsoir” in the evening.'},
+  {t:'build', src:'Good evening, Anna', answer:'Bonsoir, Anna', extra:['Bonjour','nuit'],
+   tip:'“Bonne nuit” is only for going to bed. To greet someone at night, say “bonsoir”.'},
+  {t:'match', pairs:[['bonjour','hello'],['au revoir','goodbye'],['merci','thank you'],['s’il vous plaît','please'],['oui','yes']]},
+  {t:'choice', prompt:'What does this mean?', es:'Comment ça va ?', options:['How are you?','Where are you?','Who are you?'], answer:0,
+   tip:'A friendly “how are you?”. The usual reply is “Ça va bien, merci.”'},
+  {t:'build', src:'I am well, thanks', answer:'Je vais bien, merci', extra:['suis','mal'],
+   tip:'French uses aller (to go) for how you are: “je vais bien”, literally “I go well”.'},
+  {t:'convo', npc:'Camille', npcEmoji:'👩🏼', scene:'Meeting someone at a hostel in Lyon',
+   tip:'You just held your first real conversation in French!',
+   turns:[
+    {npc:'Salut ! Je m’appelle Camille. Et toi, tu t’appelles comment ?', en:'Hi! I’m Camille. And you, what’s your name?', choices:[
+      {es:'J’ai vingt ans.', fb:'That means “I’m 20 years old”. She asked your name. Try “Je m’appelle…”.'},
+      {es:'Je m’appelle Alex.', ok:true},
+      {es:'Au revoir, Camille.', fb:'You just said goodbye before saying hello! 😄'}]},
+    {npc:'Enchantée, Alex ! Ça va ?', en:'Nice to meet you, Alex! How’s it going?', choices:[
+      {es:'Ça va bien, et toi ?', ok:true},
+      {es:'Je m’appelle bien.', fb:'“Je m’appelle” is only for names. For how you feel, say “ça va bien”.'}]},
+    {npc:'Super ! Bon, à plus tard.', en:'Great! OK, see you later.', choices:[
+      {es:'Tu t’appelles comment ?', fb:'You already know her name: Camille!'},
+      {es:'À plus tard !', ok:true}]}
+   ]}
+  ]},
+{ id:'cafe', title:'At the Café', emoji:'☕', color:'#C0763A',
+  desc:'Order like a local, ask the price, and pay. Ends with ordering from Julien in a Paris café.',
+  words:['un café crème','à emporter','l’addition','c’est combien ?','une carafe d’eau'],
+  ex:[
+  {t:'choice', prompt:'Which one is “coffee”?', options:[{e:'💧',w:'l’eau'},{e:'☕',w:'le café'},{e:'🥐',w:'le croissant'},{e:'🍵',w:'le thé'}], answer:1,
+   tip:'In France, “un café” is a small espresso. For a milky coffee, ask for “un café crème”.'},
+  {t:'listen', say:'Une carafe d’eau, s’il vous plaît', options:['A coffee, please','A jug of water, please','The bill, please'], answer:1,
+   tip:'Tap water (“une carafe d’eau”) is free in French restaurants. Just ask!'},
+  {t:'build', src:'A coffee and a croissant, please', answer:'Un café et un croissant, s’il vous plaît', extra:['une','thé'],
+   tip:'Both words are masculine, so both take “un”. Feminine words take “une”, as in “une bière”.'},
+  {t:'match', pairs:[['café','coffee'],['lait','milk'],['thé','tea'],['l’addition','the bill'],['eau','water']]},
+  {t:'choice', prompt:'What does this mean?', es:'C’est combien ?', options:['What time is it?','How much is it?','How many are there?'], answer:1,
+   tip:'The everyday way to ask a price. A more formal version is “Ça coûte combien ?”.'},
+  {t:'listen', say:'L’addition, s’il vous plaît', options:['The menu, please','The table, please','The bill, please'], answer:2,
+   tip:'French waiters won’t rush you. They wait until you ask for “l’addition”.'},
+  {t:'convo', npc:'Julien', npcEmoji:'👨🏻‍🍳', scene:'Ordering at a café in Paris',
+   tip:'Order placed and paid, all in French. ☕',
+   turns:[
+    {npc:'Bonjour ! Qu’est-ce que je vous sers ?', en:'Hello! What can I get you?', choices:[
+      {es:'Ça va bien, merci.', fb:'That answers “how are you?”. He wants your order!'},
+      {es:'L’addition, s’il vous plaît.', fb:'You haven’t ordered yet. That asks for the bill.'},
+      {es:'Un café crème, s’il vous plaît.', ok:true}]},
+    {npc:'Sur place ou à emporter ?', en:'For here or to go?', choices:[
+      {es:'Avec du lait.', fb:'He asked “here or to go?”. “À emporter” means to go.'},
+      {es:'À emporter, s’il vous plaît.', ok:true}]},
+    {npc:'Très bien. Ça fait trois euros.', en:'Very good. That’s three euros.', choices:[
+      {es:'Voilà. Merci !', ok:true},
+      {es:'Tu t’appelles comment ?', fb:'Maybe not the moment to ask his name. 😅 Pay first!'}]}
+   ]}
+  ]},
+{ id:'around', title:'Getting Around', emoji:'🧭', color:'#2A9D8F',
+  desc:'Ask where things are and understand directions. Ends with asking a stranger for help in Paris.',
+  words:['où est… ?','à gauche','à droite','tout droit','près'],
+  ex:[
+  {t:'choice', prompt:'Which one is “the train station”?', options:[{e:'🏨',w:'l’hôtel'},{e:'🏖️',w:'la plage'},{e:'🚉',w:'la gare'},{e:'🏥',w:'l’hôpital'}], answer:2,
+   tip:'“La gare” is a train station. A metro station is “une station de métro”.'},
+  {t:'choice', prompt:'What does this mean?', es:'Où sont les toilettes ?', options:['Are these the toilets?','Where are the toilets?','When do the toilets open?'], answer:1,
+   tip:'où = where. “Toilettes” is always plural in French, so it’s “sont”, not “est”.'},
+  {t:'build', src:'Turn left', answer:'Tournez à gauche', extra:['droite','tout'],
+   tip:'gauche = left, droite = right. Careful: “tout droit” means straight ahead, not right!'},
+  {t:'listen', say:'Tout droit', options:['On the right','Straight ahead','Behind you'], answer:1,
+   tip:'“Tout droit” (straight ahead) sounds a lot like “à droite” (on the right). Listen for the “à”.'},
+  {t:'match', pairs:[['gauche','left'],['droite','right'],['près','near'],['loin','far'],['ici','here']]},
+  {t:'build', src:'Is it far?', answer:'C’est loin ?', extra:['près','Il'],
+   tip:'In spoken French, you can turn a sentence into a question just by raising your voice: “C’est loin ?”.'},
+  {t:'convo', npc:'Léa', npcEmoji:'👩🏾', scene:'Lost near the Louvre',
+   tip:'You found your way without opening a map app. 🧭',
+   turns:[
+    {npc:'Bonjour, je peux vous aider ?', en:'Hello, can I help you?', choices:[
+      {es:'Oui, où est la gare ?', ok:true},
+      {es:'Un café, s’il vous plaît.', fb:'She’s a helpful stranger, not a waiter! ☕'}]},
+    {npc:'Allez tout droit, puis tournez à droite.', en:'Go straight ahead, then turn right.', choices:[
+      {es:'Ça va ?', fb:'Ask about the directions instead: is it far?'},
+      {es:'C’est loin ?', ok:true}]},
+    {npc:'Non, c’est tout près. Cinq minutes.', en:'No, it’s really close. Five minutes.', choices:[
+      {es:'Tournez à gauche.', fb:'Now you’re giving her directions! Just thank her.'},
+      {es:'Merci beaucoup !', ok:true}]}
+   ]}
+  ]},
+{ id:'friends', title:'Making Friends', emoji:'🎉', color:'#E76FAE',
+  desc:'Talk about where you’re from and what you like. Ends with making weekend plans.',
+  words:['je viens de…','j’aime','tu veux… ?','la plage','l’ami'],
+  ex:[
+  {t:'choice', prompt:'Which one is “friend”?', options:[{e:'🐶',w:'le chien'},{e:'🧑‍🤝‍🧑',w:'l’ami'},{e:'🏠',w:'la maison'},{e:'📚',w:'le livre'}], answer:1,
+   tip:'un ami (male friend), une amie (female friend). They sound exactly the same!'},
+  {t:'build', src:'I like music', answer:'J’aime la musique', extra:['Je','aimes'],
+   tip:'“Je” shortens to “J’” before a vowel, so it’s “j’aime”, never “je aime”.'},
+  {t:'listen', say:'Tu viens d’où ?', options:['Where are you going?','Where do you live?','Where are you from?'], answer:2,
+   tip:'Literally “you come from where?”. Answer with “Je viens de…”.'},
+  {t:'match', pairs:[['chien','dog'],['chat','cat'],['musique','music'],['livre','book'],['plage','beach']]},
+  {t:'choice', prompt:'How do you say “I’m from Australia”?', options:['Je suis Australie','Je viens d’Australie','Je m’appelle Australie'], answer:1,
+   tip:'“Venir de” = to come from. “de” becomes “d’” before a vowel: d’Australie.'},
+  {t:'build', src:'Do you want to go to the beach?', answer:'Tu veux aller à la plage ?', extra:['maison','Je'],
+   tip:'tu veux = you want, je veux = I want. Add any place after “aller à…”.'},
+  {t:'convo', npc:'Malik', npcEmoji:'🧑🏾‍🦱', scene:'At a friend’s party',
+   tip:'New friend unlocked. Beach on Saturday! 🏖️',
+   turns:[
+    {npc:'Salut ! Tu viens d’où ?', en:'Hi! Where are you from?', choices:[
+      {es:'Je suis Australie.', fb:'That says “I am Australia”! Try “Je viens d’Australie” (I come from Australia).'},
+      {es:'Je viens d’Australie. Et toi ?', ok:true}]},
+    {npc:'Moi, je viens de Marseille. Qu’est-ce que tu aimes faire ?', en:'I’m from Marseille. What do you like to do?', choices:[
+      {es:'J’aime la musique et la plage.', ok:true},
+      {es:'Je aime la musique.', fb:'“Je” shortens before a vowel, so it’s “J’aime”.'}]},
+    {npc:'Moi aussi ! Tu veux aller à la plage samedi ?', en:'Me too! Want to go to the beach on Saturday?', choices:[
+      {es:'L’addition, s’il vous plaît.', fb:'Ha, wrong scene! He’s inviting you to the beach.'},
+      {es:'Oui, avec plaisir !', ok:true}]}
+   ]}
+  ]}
+]},
+
+de:{ name:'German', flag:'🇩🇪', voice:'de-DE', hello:'Hallo!', unit:'Survive your first trip', group:'European languages', lessons:[
+{ id:'greet', title:'First Hellos', emoji:'👋', color:'#FF6B4A',
+  desc:'Say hi, introduce yourself, and finish with a real chat with Lena at a hostel in Berlin.',
+  words:['hallo','guten Morgen','wie geht’s?','ich heiße','danke'],
+  ex:[
+  {t:'choice', prompt:'Which one means “hello”?', options:[{e:'👋',w:'hallo'},{e:'🚪',w:'tschüss'},{e:'🙏',w:'danke'},{e:'🥺',w:'bitte'}], answer:0,
+   tip:'“Hallo” is casual. In shops and offices, “Guten Tag” is the safer choice.'},
+  {t:'listen', say:'Guten Morgen', options:['Good morning','Good night','Good day'], answer:0,
+   tip:'“Morgen” means morning, but lowercase “morgen” means tomorrow!'},
+  {t:'build', src:'Good night, Anna', answer:'Gute Nacht, Anna', extra:['Guten','Morgen'],
+   tip:'“Nacht” is feminine, so it’s “gute Nacht”, but masculine words give “guten Morgen” and “guten Tag”.'},
+  {t:'match', pairs:[['hallo','hello'],['tschüss','bye'],['danke','thank you'],['bitte','please'],['ja','yes']]},
+  {t:'choice', prompt:'What does this mean?', es:'Wie geht’s?', options:['How are you?','Where are you?','Who are you?'], answer:0,
+   tip:'Short for “Wie geht es dir?”, literally “how goes it?”.'},
+  {t:'build', src:'I am well, thanks', answer:'Mir geht’s gut, danke', extra:['Ich','schlecht'],
+   tip:'Germans say “mir geht’s gut” (it goes well for me), not “ich bin gut”.'},
+  {t:'convo', npc:'Lena', npcEmoji:'👱🏼‍♀️', scene:'Meeting someone at a hostel in Berlin',
+   tip:'You just held your first real conversation in German!',
+   turns:[
+    {npc:'Hallo! Ich heiße Lena. Wie heißt du?', en:'Hi! I’m Lena. What’s your name?', choices:[
+      {es:'Ich bin zwanzig Jahre alt.', fb:'That means “I’m 20 years old”. She asked your name. Try “Ich heiße…”.'},
+      {es:'Ich heiße Alex.', ok:true},
+      {es:'Tschüss, Lena!', fb:'You just said goodbye before saying hello! 😄'}]},
+    {npc:'Freut mich, Alex! Wie geht’s?', en:'Nice to meet you, Alex! How are you?', choices:[
+      {es:'Gut, danke! Und dir?', ok:true},
+      {es:'Ich heiße gut.', fb:'“Ich heiße” is only for names. For how you feel, say “gut, danke”.'}]},
+    {npc:'Super! Also, bis später.', en:'Great! Well, see you later.', choices:[
+      {es:'Wie heißt du?', fb:'You already know her name: Lena!'},
+      {es:'Bis später!', ok:true}]}
+   ]}
+  ]},
+{ id:'cafe', title:'At the Café', emoji:'☕', color:'#C0763A',
+  desc:'Order like a local, ask the price, and pay. Ends with ordering from Jonas in a Munich café.',
+  words:['einen Kaffee','mit Milch','zum Mitnehmen','die Rechnung','was kostet das?'],
+  ex:[
+  {t:'choice', prompt:'Which one is “coffee”?', options:[{e:'💧',w:'das Wasser'},{e:'☕',w:'der Kaffee'},{e:'🥨',w:'die Brezel'},{e:'🍵',w:'der Tee'}], answer:1,
+   tip:'Every German noun is capitalised and has a gender: der (masculine), die (feminine), das (neuter).'},
+  {t:'listen', say:'Ein Wasser, bitte', options:['A coffee, please','A water, please','The bill, please'], answer:1,
+   tip:'“Bitte” means please, but also “you’re welcome” and “here you go”. A very handy word.'},
+  {t:'build', src:'A coffee with milk, please', answer:'Einen Kaffee mit Milch, bitte', extra:['ohne','Tee'],
+   tip:'mit = with, ohne = without. “Kaffee” is masculine, so when you order one, “ein” becomes “einen”.'},
+  {t:'match', pairs:[['Kaffee','coffee'],['Milch','milk'],['Tee','tea'],['die Rechnung','the bill'],['Wasser','water']]},
+  {t:'choice', prompt:'What does this mean?', es:'Was kostet das?', options:['What time is it?','How much is that?','What is that?'], answer:1,
+   tip:'Literally “what costs that?”. The answer will be in euros, like “drei Euro”.'},
+  {t:'listen', say:'Die Rechnung, bitte', options:['The menu, please','The table, please','The bill, please'], answer:2,
+   tip:'You can also say “Zahlen, bitte!”. The waiter will often ask “Zusammen oder getrennt?” (together or separate?).'},
+  {t:'convo', npc:'Jonas', npcEmoji:'🧑🏼‍🍳', scene:'Ordering at a café in Munich',
+   tip:'Order placed and paid, all in German. ☕',
+   turns:[
+    {npc:'Hallo! Was darf’s sein?', en:'Hi! What can I get you?', choices:[
+      {es:'Mir geht’s gut, danke.', fb:'That answers “how are you?”. He wants your order!'},
+      {es:'Die Rechnung, bitte.', fb:'You haven’t ordered yet. That asks for the bill.'},
+      {es:'Einen Kaffee mit Milch, bitte.', ok:true}]},
+    {npc:'Für hier oder zum Mitnehmen?', en:'For here or to go?', choices:[
+      {es:'Mit Milch.', fb:'He asked “here or to go?”. “Zum Mitnehmen” means to go.'},
+      {es:'Zum Mitnehmen, bitte.', ok:true}]},
+    {npc:'Gerne. Das macht drei Euro.', en:'Sure. That’s three euros.', choices:[
+      {es:'Bitte schön. Danke!', ok:true},
+      {es:'Wie heißt du?', fb:'Maybe not the moment to ask his name. 😅 Pay first!'}]}
+   ]}
+  ]},
+{ id:'around', title:'Getting Around', emoji:'🧭', color:'#2A9D8F',
+  desc:'Ask where things are and understand directions. Ends with asking a stranger for help in Hamburg.',
+  words:['wo ist…?','links','rechts','geradeaus','nah'],
+  ex:[
+  {t:'choice', prompt:'Which one is “the train station”?', options:[{e:'🏨',w:'das Hotel'},{e:'🏖️',w:'der Strand'},{e:'🚉',w:'der Bahnhof'},{e:'🏥',w:'das Krankenhaus'}], answer:2,
+   tip:'“Bahnhof” = train station. The main station, “Hauptbahnhof”, is shortened to “Hbf” on signs.'},
+  {t:'choice', prompt:'What does this mean?', es:'Wo ist die Toilette?', options:['Is this the toilet?','Where is the toilet?','When does the toilet open?'], answer:1,
+   tip:'wo = where. Careful: “wer” means who, and “wo” means where.'},
+  {t:'build', src:'Turn left', answer:'Biegen Sie links ab', extra:['rechts','geradeaus'],
+   tip:'links = left, rechts = right. The verb “abbiegen” splits in two: “Biegen Sie … ab”.'},
+  {t:'listen', say:'Geradeaus', options:['On the right','Straight ahead','Behind you'], answer:1,
+   tip:'“Geradeaus” = straight ahead. One of the most useful direction words you’ll hear.'},
+  {t:'match', pairs:[['links','left'],['rechts','right'],['nah','near'],['weit','far'],['hier','here']]},
+  {t:'build', src:'Is it far?', answer:'Ist es weit?', extra:['nah','Wo'],
+   tip:'For a yes/no question in German, put the verb first: “Es ist weit” becomes “Ist es weit?”.'},
+  {t:'convo', npc:'Herr Becker', npcEmoji:'👴🏻', scene:'Lost in Hamburg',
+   tip:'You found your way without opening a map app. 🧭',
+   turns:[
+    {npc:'Hallo, kann ich Ihnen helfen?', en:'Hello, can I help you?', choices:[
+      {es:'Ja, wo ist der Bahnhof?', ok:true},
+      {es:'Einen Kaffee, bitte.', fb:'He’s a helpful stranger, not a waiter! ☕'}]},
+    {npc:'Gehen Sie geradeaus und dann rechts.', en:'Go straight ahead and then right.', choices:[
+      {es:'Wie geht’s?', fb:'Ask about the directions instead: is it far?'},
+      {es:'Ist es weit?', ok:true}]},
+    {npc:'Nein, es ist ganz nah. Fünf Minuten.', en:'No, it’s really close. Five minutes.', choices:[
+      {es:'Biegen Sie links ab.', fb:'Now you’re giving him directions! Just thank him.'},
+      {es:'Vielen Dank!', ok:true}]}
+   ]}
+  ]},
+{ id:'friends', title:'Making Friends', emoji:'🎉', color:'#E76FAE',
+  desc:'Talk about where you’re from and what you like. Ends with making weekend plans.',
+  words:['ich komme aus…','ich mag','willst du…?','der Strand','der Freund'],
+  ex:[
+  {t:'choice', prompt:'Which one is “friend”?', options:[{e:'🐶',w:'der Hund'},{e:'🧑‍🤝‍🧑',w:'der Freund'},{e:'🏠',w:'das Haus'},{e:'📚',w:'das Buch'}], answer:1,
+   tip:'der Freund (male friend), die Freundin (female friend). Careful: “meine Freundin” can also mean “my girlfriend”!'},
+  {t:'build', src:'I like music', answer:'Ich mag Musik', extra:['magst','Du'],
+   tip:'mögen = to like: ich mag, du magst. For general likes, German often drops the article: “Ich mag Musik”.'},
+  {t:'listen', say:'Woher kommst du?', options:['Where are you going?','Where do you live?','Where are you from?'], answer:2,
+   tip:'woher = from where. Answer with “Ich komme aus…”.'},
+  {t:'match', pairs:[['Hund','dog'],['Katze','cat'],['Musik','music'],['Buch','book'],['Strand','beach']]},
+  {t:'choice', prompt:'How do you say “I’m from Australia”?', options:['Ich bin von Australien','Ich komme aus Australien','Ich heiße Australien'], answer:1,
+   tip:'For where you’re from, German uses “aus”: “Ich komme aus…”.'},
+  {t:'build', src:'Do you want to go to the beach?', answer:'Willst du zum Strand gehen?', extra:['Haus','Ich'],
+   tip:'In questions, the verb comes first, and the second verb (“gehen”) jumps to the end.'},
+  {t:'convo', npc:'Tim', npcEmoji:'🧑🏻', scene:'At a friend’s party',
+   tip:'New friend unlocked. Beach on Saturday! 🏖️',
+   turns:[
+    {npc:'Hi! Woher kommst du?', en:'Hi! Where are you from?', choices:[
+      {es:'Ich bin von Australien.', fb:'Close! For where you’re from, say “Ich komme aus…”.'},
+      {es:'Ich komme aus Australien. Und du?', ok:true}]},
+    {npc:'Ich komme aus Köln. Was machst du gern?', en:'I’m from Cologne. What do you like doing?', choices:[
+      {es:'Ich mag Musik und den Strand.', ok:true},
+      {es:'Ich magst Musik.', fb:'“magst” goes with “du”. With “ich”, it’s “ich mag”.'}]},
+    {npc:'Ich auch! Willst du am Samstag zum Strand gehen?', en:'Me too! Want to go to the beach on Saturday?', choices:[
+      {es:'Die Rechnung, bitte.', fb:'Ha, wrong scene! He’s inviting you to the beach.'},
+      {es:'Ja, gerne!', ok:true}]}
+   ]}
+  ]}
+]},
+
+hi:{ name:'Hindi', flag:'🇮🇳', voice:'hi-IN', hello:'नमस्ते!|Namaste!', unit:'Survive your first trip', group:'Indian languages', rom:true, lessons:[
+{ id:'greet', title:'First Hellos', emoji:'👋', color:'#FF6B4A',
+  desc:'Say hi, introduce yourself, and finish with a real chat with Priya at a hostel in Jaipur.',
+  words:['नमस्ते|namaste','शुक्रिया|shukriya','आप कैसे हैं?|aap kaise hain?','मेरा नाम|mera naam'],
+  ex:[
+  {t:'choice', prompt:'Which one means “hello”?', options:[{e:'👋',w:'नमस्ते|namaste'},{e:'🚪',w:'अलविदा|alvida'},{e:'🙏',w:'धन्यवाद|dhanyavaad'},{e:'🥺',w:'कृपया|kripya'}], answer:0,
+   tip:'नमस्ते (namaste) works as both hello and goodbye. Say it with your palms pressed together for extra warmth.'},
+  {t:'listen', say:'शुक्रिया|shukriya', options:['Thank you','Sorry','Goodbye'], answer:0,
+   tip:'शुक्रिया (shukriya) is the everyday thank-you. धन्यवाद (dhanyavaad) is more formal.'},
+  {t:'build', src:'Nice to meet you', answer:['आपसे|aapse','मिलकर|milkar','खुशी|khushi','हुई|hui'], extra:['नमस्ते|namaste','है|hai'],
+   tip:'Literally “meeting you, happiness happened”. Use it right after introductions.'},
+  {t:'match', pairs:[['नमस्ते|namaste','hello'],['शुक्रिया|shukriya','thank you'],['हाँ|haan','yes'],['नहीं|nahin','no'],['कृपया|kripya','please']]},
+  {t:'choice', prompt:'What does this mean?', es:'आप कैसे हैं?|Aap kaise hain?', options:['How are you?','Where are you?','Who are you?'], answer:0,
+   tip:'आप (aap) is the polite “you”. With close friends, say तुम कैसे हो? (tum kaise ho?). When asking a woman, कैसे becomes कैसी (kaisi).'},
+  {t:'build', src:'My name is Alex', answer:['मेरा|mera','नाम|naam','एलेक्स|Alex','है|hai'], extra:['आप|aap','क्या|kya'],
+   tip:'Hindi puts the verb at the end: “my name Alex is”.'},
+  {t:'convo', npc:'Priya', npcEmoji:'👩🏽', scene:'Meeting someone at a hostel in Jaipur',
+   tip:'You just held your first real conversation in Hindi!',
+   turns:[
+    {npc:'नमस्ते! मेरा नाम प्रिया है। आपका नाम क्या है?|Namaste! Mera naam Priya hai. Aapka naam kya hai?', en:'Hi! My name is Priya. What’s your name?', choices:[
+      {es:'मैं बीस साल का हूँ।|Main bees saal ka hoon.', fb:'That means “I’m 20 years old”. She asked your name. Try “Mera naam…”.'},
+      {es:'मेरा नाम एलेक्स है।|Mera naam Alex hai.', ok:true},
+      {es:'अलविदा!|Alvida!', fb:'You just said goodbye before saying hello! 😄'}]},
+    {npc:'आपसे मिलकर खुशी हुई! आप कैसे हैं?|Aapse milkar khushi hui! Aap kaise hain?', en:'Nice to meet you! How are you?', choices:[
+      {es:'मैं ठीक हूँ, और आप?|Main theek hoon, aur aap?', ok:true},
+      {es:'मेरा नाम ठीक है।|Mera naam theek hai.', fb:'That means “my name is fine” 😄. Say मैं ठीक हूँ (main theek hoon).'}]},
+    {npc:'बढ़िया! फिर मिलेंगे।|Badhiya! Phir milenge.', en:'Great! See you again.', choices:[
+      {es:'आपका नाम क्या है?|Aapka naam kya hai?', fb:'You already know her name: Priya!'},
+      {es:'फिर मिलेंगे!|Phir milenge!', ok:true}]}
+   ]}
+  ]},
+{ id:'cafe', title:'At the Chai Stall', emoji:'🫖', color:'#C0763A',
+  desc:'Order chai like a local, ask the price, and pay. Ends with ordering from Ramesh at a stall in Delhi.',
+  words:['चाय|chai','दीजिए|dijiye','कम चीनी|kam cheeni','कितने पैसे?|kitne paise?'],
+  ex:[
+  {t:'choice', prompt:'Which one is “tea”?', options:[{e:'💧',w:'पानी|paani'},{e:'☕',w:'कॉफ़ी|coffee'},{e:'🫖',w:'चाय|chai'},{e:'🥟',w:'समोसा|samosa'}], answer:2,
+   tip:'चाय (chai) just means tea. In India it’s usually brewed with milk, sugar and spices.'},
+  {t:'listen', say:'एक पानी दीजिए|Ek paani dijiye', options:['A tea, please','A water, please','The bill, please'], answer:1,
+   tip:'दीजिए (dijiye) is the polite “please give”. Put it after anything you want.'},
+  {t:'build', src:'Two teas, please', answer:['दो|do','चाय|chai','दीजिए|dijiye'], extra:['एक|ek','पानी|paani'],
+   tip:'एक (ek) = 1, दो (do) = 2. चाय doesn’t change in the plural.'},
+  {t:'match', pairs:[['चाय|chai','tea'],['दूध|doodh','milk'],['चीनी|cheeni','sugar'],['पानी|paani','water'],['समोसा|samosa','samosa']]},
+  {t:'choice', prompt:'What does this mean?', es:'कितने पैसे हुए?|Kitne paise hue?', options:['What time is it?','How much is it?','Where is it?'], answer:1,
+   tip:'Literally “how much money happened?”. Prices are in rupees: बीस रुपये (bees rupaye) = ₹20.'},
+  {t:'listen', say:'कम चीनी, प्लीज़|Kam cheeni, please', options:['Extra sugar, please','Less sugar, please','No milk, please'], answer:1,
+   tip:'कम (kam) = less, ज़्यादा (zyada) = more. Hindi borrows lots of English words, like “please”!'},
+  {t:'convo', npc:'Ramesh', npcEmoji:'👨🏽', scene:'Ordering at a chai stall in Delhi',
+   tip:'Chai ordered and paid, all in Hindi. 🫖',
+   turns:[
+    {npc:'आइए! क्या लेंगे?|Aaiye! Kya lenge?', en:'Come! What will you have?', choices:[
+      {es:'मैं ठीक हूँ।|Main theek hoon.', fb:'That’s “I’m fine”. He wants your order!'},
+      {es:'कितने पैसे हुए?|Kitne paise hue?', fb:'You haven’t ordered yet!'},
+      {es:'एक चाय दीजिए।|Ek chai dijiye.', ok:true}]},
+    {npc:'चीनी कितनी?|Cheeni kitni?', en:'How much sugar?', choices:[
+      {es:'दो समोसा।|Do samosa.', fb:'He asked about sugar! Try कम चीनी (kam cheeni).'},
+      {es:'कम चीनी, प्लीज़।|Kam cheeni, please.', ok:true}]},
+    {npc:'बीस रुपये।|Bees rupaye.', en:'Twenty rupees.', choices:[
+      {es:'ये लीजिए। शुक्रिया!|Ye lijiye. Shukriya!', ok:true},
+      {es:'आपका नाम क्या है?|Aapka naam kya hai?', fb:'Maybe not the moment to ask his name. 😅 Pay first!'}]}
+   ]}
+  ]},
+{ id:'around', title:'Getting Around', emoji:'🧭', color:'#2A9D8F',
+  desc:'Ask where things are and understand directions. Ends with asking an auntie for help in Mumbai.',
+  words:['कहाँ है?|kahaan hai?','बाएँ|baayen','दाएँ|daayen','सीधे|seedhe'],
+  ex:[
+  {t:'choice', prompt:'Which one is “the station”?', options:[{e:'🏨',w:'होटल|hotel'},{e:'🏖️',w:'समुद्र तट|samudra tat'},{e:'🚉',w:'स्टेशन|station'},{e:'🏥',w:'अस्पताल|aspataal'}], answer:2,
+   tip:'Hindi often uses English words for modern places, like स्टेशन (station) and होटल (hotel).'},
+  {t:'choice', prompt:'What does this mean?', es:'बाथरूम कहाँ है?|Bathroom kahaan hai?', options:['Is this the bathroom?','Where is the bathroom?','When is the bathroom open?'], answer:1,
+   tip:'कहाँ (kahaan) = where. Pattern: [place] कहाँ है?'},
+  {t:'build', src:'Turn left from here', answer:['यहाँ|yahaan','से|se','बाएँ|baayen','मुड़िए|mudiye'], extra:['दाएँ|daayen','सीधे|seedhe'],
+   tip:'बाएँ (baayen) = left, दाएँ (daayen) = right. मुड़िए (mudiye) = please turn.'},
+  {t:'listen', say:'सीधे जाइए|Seedhe jaaiye', options:['Turn right','Go straight ahead','Go back'], answer:1,
+   tip:'सीधे (seedhe) = straight. जाइए (jaaiye) = please go.'},
+  {t:'match', pairs:[['बाएँ|baayen','left'],['दाएँ|daayen','right'],['पास|paas','near'],['दूर|door','far'],['यहाँ|yahaan','here']]},
+  {t:'build', src:'Is it far?', answer:['क्या|kya','यह|yah','दूर|door','है?|hai?'], extra:['पास|paas','कहाँ|kahaan'],
+   tip:'Put क्या (kya) at the start to turn a sentence into a yes/no question.'},
+  {t:'convo', npc:'Auntie', npcEmoji:'👵🏽', scene:'Lost in Mumbai',
+   tip:'You found your way without opening a map app. 🧭',
+   turns:[
+    {npc:'बेटा, कोई परेशानी?|Beta, koi pareshani?', en:'Dear, is something wrong?', choices:[
+      {es:'जी, स्टेशन कहाँ है?|Ji, station kahaan hai?', ok:true},
+      {es:'एक चाय दीजिए।|Ek chai dijiye.', fb:'She’s a helpful stranger, not a chaiwala! 🫖'}]},
+    {npc:'सीधे जाइए, फिर दाएँ मुड़िए।|Seedhe jaaiye, phir daayen mudiye.', en:'Go straight, then turn right.', choices:[
+      {es:'आप कैसे हैं?|Aap kaise hain?', fb:'Ask about the directions instead: is it far?'},
+      {es:'क्या यह दूर है?|Kya yah door hai?', ok:true}]},
+    {npc:'नहीं, पास ही है। पाँच मिनट।|Nahin, paas hi hai. Paanch minute.', en:'No, it’s close by. Five minutes.', choices:[
+      {es:'बाएँ मुड़िए।|Baayen mudiye.', fb:'Now you’re giving her directions! Just thank her.'},
+      {es:'बहुत शुक्रिया, आंटी!|Bahut shukriya, aunty!', ok:true}]}
+   ]}
+  ]},
+{ id:'friends', title:'Making Friends', emoji:'🎉', color:'#E76FAE',
+  desc:'Talk about where you’re from and what you like. Ends with making weekend plans.',
+  words:['दोस्त|dost','मुझे पसंद है|mujhe pasand hai','कहाँ से?|kahaan se?','चलें?|chalein?'],
+  ex:[
+  {t:'choice', prompt:'Which one is “friend”?', options:[{e:'🐶',w:'कुत्ता|kutta'},{e:'🧑‍🤝‍🧑',w:'दोस्त|dost'},{e:'🏠',w:'घर|ghar'},{e:'📚',w:'किताब|kitaab'}], answer:1,
+   tip:'दोस्त (dost) = friend. You’ll hear it in countless Bollywood songs!'},
+  {t:'build', src:'I like music', answer:['मुझे|mujhe','संगीत|sangeet','पसंद|pasand','है|hai'], extra:['मैं|main','नहीं|nahin'],
+   tip:'Literally “to me, music is liked”. That’s why it starts with मुझे (mujhe), not मैं (main).'},
+  {t:'listen', say:'आप कहाँ से हैं?|Aap kahaan se hain?', options:['Where are you going?','Where do you live?','Where are you from?'], answer:2,
+   tip:'से (se) = from. The answer is मैं … से हूँ (main … se hoon).'},
+  {t:'match', pairs:[['कुत्ता|kutta','dog'],['बिल्ली|billi','cat'],['संगीत|sangeet','music'],['किताब|kitaab','book'],['घर|ghar','home']]},
+  {t:'choice', prompt:'How do you say “I’m from Australia”?', options:['मैं ऑस्ट्रेलिया जा रहा हूँ|Main Australia ja raha hoon','मैं ऑस्ट्रेलिया से हूँ|Main Australia se hoon','मुझे ऑस्ट्रेलिया पसंद है|Mujhe Australia pasand hai'], answer:1,
+   tip:'से (se) = from. The first option means “I’m going to Australia”.'},
+  {t:'build', src:'Shall we go to the beach?', answer:['क्या|kya','हम|hum','बीच|beach','चलें?|chalein?'], extra:['घर|ghar','मैं|main'],
+   tip:'चलें (chalein) = “shall we go?”. It’s a friendly way to suggest plans.'},
+  {t:'convo', npc:'Arjun', npcEmoji:'🧑🏽', scene:'At a friend’s party',
+   tip:'New friend unlocked. Beach on Saturday! 🏖️',
+   turns:[
+    {npc:'हाय! आप कहाँ से हैं?|Hi! Aap kahaan se hain?', en:'Hi! Where are you from?', choices:[
+      {es:'मैं ऑस्ट्रेलिया जा रहा हूँ।|Main Australia ja raha hoon.', fb:'That means “I’m going to Australia”. Use से हूँ (se hoon).'},
+      {es:'मैं ऑस्ट्रेलिया से हूँ। और आप?|Main Australia se hoon. Aur aap?', ok:true}]},
+    {npc:'मैं पुणे से हूँ। आपको क्या पसंद है?|Main Pune se hoon. Aapko kya pasand hai?', en:'I’m from Pune. What do you like?', choices:[
+      {es:'मुझे संगीत बहुत पसंद है!|Mujhe sangeet bahut pasand hai!', ok:true},
+      {es:'मैं संगीत पसंद है।|Main sangeet pasand hai.', fb:'Close! With पसंद (pasand), start with मुझे (mujhe): “to me it’s liked”.'}]},
+    {npc:'मुझे भी! शनिवार को बीच चलें?|Mujhe bhi! Shanivaar ko beach chalein?', en:'Me too! Shall we go to the beach on Saturday?', choices:[
+      {es:'कितने पैसे हुए?|Kitne paise hue?', fb:'Ha, wrong scene! He’s inviting you to the beach.'},
+      {es:'हाँ, ज़रूर!|Haan, zaroor!', ok:true}]}
+   ]}
+  ]}
+]},
+
+ta:{ name:'Tamil', flag:'🇮🇳', voice:'ta-IN', hello:'வணக்கம்!|Vanakkam!', unit:'Survive your first trip', group:'Indian languages', rom:true, lessons:[
+{ id:'greet', title:'First Hellos', emoji:'👋', color:'#FF6B4A',
+  desc:'Say hi, introduce yourself, and finish with a real chat with Meena at a hostel in Chennai.',
+  words:['வணக்கம்|vanakkam','நன்றி|nandri','எப்படி இருக்கீங்க?|eppadi irukkeenga?','என் பேர்|en per'],
+  ex:[
+  {t:'choice', prompt:'Which one means “hello”?', options:[{e:'👋',w:'வணக்கம்|vanakkam'},{e:'🙏',w:'நன்றி|nandri'},{e:'👍',w:'சரி|sari'},{e:'🙅',w:'இல்லை|illai'}], answer:0,
+   tip:'வணக்கம் (vanakkam) is a respectful hello that works any time of day.'},
+  {t:'listen', say:'நன்றி|nandri', options:['Thank you','Sorry','Goodbye'], answer:0,
+   tip:'நன்றி (nandri) = thank you. For extra thanks, say ரொம்ப நன்றி (romba nandri), “thanks a lot”.'},
+  {t:'build', src:'How are you?', answer:['நீங்க|neenga','எப்படி|eppadi','இருக்கீங்க?|irukkeenga?'], extra:['நான்|naan','பேர்|per'],
+   tip:'This is everyday spoken Tamil. நீங்க (neenga) is the polite “you”.'},
+  {t:'match', pairs:[['வணக்கம்|vanakkam','hello'],['நன்றி|nandri','thank you'],['ஆமா|aamaa','yes'],['இல்லை|illai','no'],['சரி|sari','okay']]},
+  {t:'choice', prompt:'What does this mean?', es:'நல்லா இருக்கேன்|Nalla irukken', options:['I’m fine','I’m hungry','I’m lost'], answer:0,
+   tip:'நல்லா (nalla) = well. It’s the classic reply to “eppadi irukkeenga?”.'},
+  {t:'build', src:'My name is Alex', answer:['என்|en','பேர்|per','அலெக்ஸ்|Alex'], extra:['நீங்க|neenga','என்ன|enna'],
+   tip:'Spoken Tamil usually drops “is”: “my name Alex” is a complete sentence.'},
+  {t:'convo', npc:'Meena', npcEmoji:'👩🏾', scene:'Meeting someone at a hostel in Chennai',
+   tip:'You just held your first real conversation in Tamil!',
+   turns:[
+    {npc:'வணக்கம்! என் பேர் மீனா. உங்க பேர் என்ன?|Vanakkam! En per Meena. Unga per enna?', en:'Hello! My name is Meena. What’s your name?', choices:[
+      {es:'எனக்கு இருபது வயசு.|Enakku irubadhu vayasu.', fb:'That means “I’m 20 years old”. She asked your name. Try “En per…”.'},
+      {es:'என் பேர் அலெக்ஸ்.|En per Alex.', ok:true},
+      {es:'போயிட்டு வரேன்!|Poyittu varen!', fb:'That’s how you say goodbye. You only just said hello! 😄'}]},
+    {npc:'சந்தோஷம்! எப்படி இருக்கீங்க?|Santhosham! Eppadi irukkeenga?', en:'Nice to meet you! How are you?', choices:[
+      {es:'நல்லா இருக்கேன், நீங்க?|Nalla irukken, neenga?', ok:true},
+      {es:'என் பேர் நல்லா.|En per nalla.', fb:'“En per” is only for your name! Say நல்லா இருக்கேன் (nalla irukken).'}]},
+    {npc:'சூப்பர்! அப்புறம் பார்க்கலாம்.|Super! Appuram paarkalaam.', en:'Great! See you later.', choices:[
+      {es:'உங்க பேர் என்ன?|Unga per enna?', fb:'You already know her name: Meena!'},
+      {es:'சரி, அப்புறம் பார்க்கலாம்!|Sari, appuram paarkalaam!', ok:true}]}
+   ]}
+  ]},
+{ id:'cafe', title:'At the Coffee Stall', emoji:'☕', color:'#C0763A',
+  desc:'Order filter coffee like a local, ask the price, and pay. Ends with ordering from Murugan in Madurai.',
+  words:['காபி|kaapi','குடுங்க|kudunga','கம்மியா|kammiyaa','எவ்வளவு?|evvalavu?'],
+  ex:[
+  {t:'choice', prompt:'Which one is “coffee”?', options:[{e:'💧',w:'தண்ணீர்|thanneer'},{e:'☕',w:'காபி|kaapi'},{e:'🫖',w:'டீ|tea'},{e:'🥞',w:'தோசை|dosai'}], answer:1,
+   tip:'Tamil Nadu is famous for filter காபி (kaapi), served frothy in a steel tumbler.'},
+  {t:'listen', say:'ஒரு தண்ணீர் குடுங்க|Oru thanneer kudunga', options:['A coffee, please','A water, please','The bill, please'], answer:1,
+   tip:'குடுங்க (kudunga) = please give. Put it after anything you want.'},
+  {t:'build', src:'Two coffees, please', answer:['ரெண்டு|rendu','காபி|kaapi','குடுங்க|kudunga'], extra:['ஒரு|oru','டீ|tea'],
+   tip:'ஒரு (oru) = one, ரெண்டு (rendu) = two (spoken form).'},
+  {t:'match', pairs:[['காபி|kaapi','coffee'],['பால்|paal','milk'],['சர்க்கரை|sarkkarai','sugar'],['தண்ணீர்|thanneer','water'],['தோசை|dosai','dosa']]},
+  {t:'choice', prompt:'What does this mean?', es:'எவ்வளவு?|Evvalavu?', options:['What time is it?','How much is it?','Where is it?'], answer:1,
+   tip:'எவ்வளவு (evvalavu) = how much. Prices are in rupees: இருபது ரூபாய் (irubadhu roobaai) = ₹20.'},
+  {t:'listen', say:'சர்க்கரை கம்மியா|Sarkkarai kammiyaa', options:['Extra sugar','Less sugar','No milk'], answer:1,
+   tip:'கம்மி (kammi) = less. A very handy word at any tea or coffee stall!'},
+  {t:'convo', npc:'Murugan', npcEmoji:'👨🏾', scene:'Ordering filter coffee in Madurai',
+   tip:'Filter coffee ordered and paid, all in Tamil. ☕',
+   turns:[
+    {npc:'வாங்க! என்ன வேணும்?|Vaanga! Enna venum?', en:'Welcome! What would you like?', choices:[
+      {es:'நல்லா இருக்கேன்.|Nalla irukken.', fb:'That’s “I’m fine”. He wants your order!'},
+      {es:'எவ்வளவு?|Evvalavu?', fb:'You haven’t ordered yet!'},
+      {es:'ஒரு காபி குடுங்க.|Oru kaapi kudunga.', ok:true}]},
+    {npc:'சர்க்கரை போடவா?|Sarkkarai podavaa?', en:'Shall I add sugar?', choices:[
+      {es:'ரெண்டு தோசை.|Rendu dosai.', fb:'He asked about sugar! Try சர்க்கரை கம்மியா (sarkkarai kammiyaa).'},
+      {es:'சர்க்கரை கம்மியா.|Sarkkarai kammiyaa.', ok:true}]},
+    {npc:'இருபது ரூபாய்.|Irubadhu roobaai.', en:'Twenty rupees.', choices:[
+      {es:'இந்தாங்க. நன்றி!|Indhaanga. Nandri!', ok:true},
+      {es:'உங்க பேர் என்ன?|Unga per enna?', fb:'Maybe not the moment to ask his name. 😅 Pay first!'}]}
+   ]}
+  ]},
+{ id:'around', title:'Getting Around', emoji:'🧭', color:'#2A9D8F',
+  desc:'Ask where things are and understand directions. Ends with asking a paati for help in Coimbatore.',
+  words:['எங்கே?|engae?','இடது|idadhu','வலது|valadhu','நேரா|neraa'],
+  ex:[
+  {t:'choice', prompt:'Which one is “the railway station”?', options:[{e:'🏨',w:'ஹோட்டல்|hotel'},{e:'🏖️',w:'கடற்கரை|kadarkarai'},{e:'🚉',w:'ரயில் நிலையம்|rayil nilaiyam'},{e:'🏥',w:'மருத்துவமனை|maruthuvamanai'}], answer:2,
+   tip:'ரயில் நிலையம் (rayil nilaiyam) = railway station. In everyday speech, people often just say “station”.'},
+  {t:'choice', prompt:'What does this mean?', es:'டாய்லெட் எங்கே?|Toilet engae?', options:['Is this the toilet?','Where is the toilet?','When does the toilet open?'], answer:1,
+   tip:'எங்கே (engae) = where. Pattern: [place] எங்கே?'},
+  {t:'build', src:'Turn left', answer:['இடது|idadhu','பக்கம்|pakkam','திரும்புங்க|thirumbunga'], extra:['வலது|valadhu','நேரா|neraa'],
+   tip:'இடது (idadhu) = left, வலது (valadhu) = right. பக்கம் (pakkam) = side.'},
+  {t:'listen', say:'நேரா போங்க|Neraa ponga', options:['Turn right','Go straight ahead','Go back'], answer:1,
+   tip:'நேரா (neraa) = straight. போங்க (ponga) = please go.'},
+  {t:'match', pairs:[['இடது|idadhu','left'],['வலது|valadhu','right'],['கிட்ட|kitta','near'],['தூரம்|dhooram','far'],['இங்கே|ingae','here']]},
+  {t:'build', src:'Is it very far?', answer:['ரொம்ப|romba','தூரமா?|dhooramaa?'], extra:['கிட்ட|kitta','எங்கே|engae'],
+   tip:'Adding -ஆ (-aa) to the end of a word turns it into a yes/no question: தூரம் → தூரமா?'},
+  {t:'convo', npc:'Paati', npcEmoji:'👵🏾', scene:'Lost in Coimbatore',
+   tip:'You found your way without opening a map app. 🧭',
+   turns:[
+    {npc:'என்ன ஆச்சு? ஏதாவது வேணுமா?|Enna aachu? Edhaavadhu venumaa?', en:'What happened? Do you need something?', choices:[
+      {es:'ஆமா, ஸ்டேஷன் எங்கே?|Aamaa, station engae?', ok:true},
+      {es:'ஒரு காபி குடுங்க.|Oru kaapi kudunga.', fb:'She’s a helpful stranger, not a coffee seller! ☕'}]},
+    {npc:'நேரா போய், வலது பக்கம் திரும்புங்க.|Neraa poi, valadhu pakkam thirumbunga.', en:'Go straight, then turn right.', choices:[
+      {es:'எப்படி இருக்கீங்க?|Eppadi irukkeenga?', fb:'Ask about the directions instead: is it far?'},
+      {es:'ரொம்ப தூரமா?|Romba dhooramaa?', ok:true}]},
+    {npc:'இல்லை, கிட்ட தான். அஞ்சு நிமிஷம்.|Illai, kitta dhaan. Anju nimisham.', en:'No, it’s close. Five minutes.', choices:[
+      {es:'இடது பக்கம் திரும்புங்க.|Idadhu pakkam thirumbunga.', fb:'Now you’re giving her directions! Just thank her.'},
+      {es:'ரொம்ப நன்றி, பாட்டி!|Romba nandri, paati!', ok:true}]}
+   ]}
+  ]},
+{ id:'friends', title:'Making Friends', emoji:'🎉', color:'#E76FAE',
+  desc:'Talk about where you’re from and what you like. Ends with making weekend plans.',
+  words:['நண்பன்|nanban','எனக்கு பிடிக்கும்|enakku pidikkum','எந்த ஊரு?|endha ooru?','போலாமா?|polaamaa?'],
+  ex:[
+  {t:'choice', prompt:'Which one is “friend”?', options:[{e:'🐶',w:'நாய்|naai'},{e:'🧑‍🤝‍🧑',w:'நண்பன்|nanban'},{e:'🏠',w:'வீடு|veedu'},{e:'📚',w:'புத்தகம்|puthagam'}], answer:1,
+   tip:'நண்பன் (nanban) = friend (male), நண்பி (nanbi) = friend (female).'},
+  {t:'build', src:'I like music', answer:['எனக்கு|enakku','இசை|isai','பிடிக்கும்|pidikkum'], extra:['நான்|naan','இல்லை|illai'],
+   tip:'Literally “to me, music is liked”. That’s why it starts with எனக்கு (enakku), not நான் (naan).'},
+  {t:'listen', say:'நீங்க எந்த ஊரு?|Neenga endha ooru?', options:['Where are you going?','Where do you live?','Where are you from?'], answer:2,
+   tip:'ஊரு (ooru) = hometown. It’s a very common, friendly question.'},
+  {t:'match', pairs:[['நாய்|naai','dog'],['பூனை|poonai','cat'],['இசை|isai','music'],['புத்தகம்|puthagam','book'],['கடற்கரை|kadarkarai','beach']]},
+  {t:'choice', prompt:'How do you say “I’m from Australia”?', options:['நான் ஆஸ்திரேலியா போறேன்|Naan Australia poren','நான் ஆஸ்திரேலியால இருந்து வரேன்|Naan Australia-la irundhu varen','எனக்கு ஆஸ்திரேலியா பிடிக்கும்|Enakku Australia pidikkum'], answer:1,
+   tip:'ல இருந்து (la irundhu) = from. The first option means “I’m going to Australia”.'},
+  {t:'build', src:'Shall we go to the beach?', answer:['பீச்சுக்கு|beachukku','போலாமா?|polaamaa?'], extra:['வீட்டுக்கு|veettukku','நான்|naan'],
+   tip:'போலாமா? (polaamaa?) = “shall we go?”. Add -க்கு (-kku) to a place to mean “to”.'},
+  {t:'convo', npc:'Karthik', npcEmoji:'🧑🏾', scene:'At a friend’s party',
+   tip:'New friend unlocked. Beach on Saturday! 🏖️',
+   turns:[
+    {npc:'ஹாய்! நீங்க எந்த ஊரு?|Hi! Neenga endha ooru?', en:'Hi! Where are you from?', choices:[
+      {es:'நான் ஆஸ்திரேலியா போறேன்.|Naan Australia poren.', fb:'That means “I’m going to Australia”. Use ல இருந்து வரேன் (la irundhu varen).'},
+      {es:'நான் ஆஸ்திரேலியால இருந்து வரேன்.|Naan Australia-la irundhu varen.', ok:true}]},
+    {npc:'நான் மதுரை. உங்களுக்கு என்ன பிடிக்கும்?|Naan Madurai. Ungalukku enna pidikkum?', en:'I’m from Madurai. What do you like?', choices:[
+      {es:'எனக்கு இசை ரொம்ப பிடிக்கும்!|Enakku isai romba pidikkum!', ok:true},
+      {es:'நான் இசை பிடிக்கும்.|Naan isai pidikkum.', fb:'Close! Start with எனக்கு (enakku): “to me it’s liked”.'}]},
+    {npc:'எனக்கும்! சனிக்கிழமை பீச்சுக்கு போலாமா?|Enakkum! Sanikkizhamai beachukku polaamaa?', en:'Me too! Shall we go to the beach on Saturday?', choices:[
+      {es:'எவ்வளவு?|Evvalavu?', fb:'Ha, wrong scene! He’s inviting you to the beach.'},
+      {es:'சரி, போலாம்!|Sari, polaam!', ok:true}]}
+   ]}
+  ]}
+]},
+
+ja:{ name:'Japanese', flag:'🇯🇵', voice:'ja-JP', hello:'こんにちは！|Konnichiwa!', unit:'Survive your first trip', group:'East Asian languages', rom:true, join:'', lessons:[
+{ id:'greet', title:'First Hellos', emoji:'👋', color:'#FF6B4A',
+  desc:'Say hi, introduce yourself, and finish with a real chat with Yui at a hostel in Kyoto.',
+  words:['こんにちは|konnichiwa','ありがとう|arigatō','お元気ですか？|o-genki desu ka?','です|desu'],
+  ex:[
+  {t:'choice', prompt:'Which one means “hello”?', options:[{e:'👋',w:'こんにちは|konnichiwa'},{e:'🚪',w:'さようなら|sayōnara'},{e:'🙏',w:'ありがとう|arigatō'},{e:'🙇',w:'すみません|sumimasen'}], answer:0,
+   tip:'こんにちは (konnichiwa) is the daytime hello. In the morning, say おはよう (ohayō).'},
+  {t:'listen', say:'おはようございます|Ohayō gozaimasu', options:['Good morning','Good night','Goodbye'], answer:0,
+   tip:'おはよう (ohayō) is casual. Adding ございます (gozaimasu) makes it polite, which is best with strangers.'},
+  {t:'build', src:'Thank you very much', answer:['どうも|dōmo','ありがとう|arigatō','ございます|gozaimasu'], extra:['すみません|sumimasen','こんにちは|konnichiwa'],
+   tip:'どうもありがとうございます is the most polite everyday thank-you. Just ありがとう (arigatō) is fine with friends.'},
+  {t:'match', pairs:[['こんにちは|konnichiwa','hello'],['さようなら|sayōnara','goodbye'],['ありがとう|arigatō','thank you'],['はい|hai','yes'],['いいえ|iie','no']]},
+  {t:'choice', prompt:'What does this mean?', es:'お元気ですか？|O-genki desu ka?', options:['How are you?','Where are you?','Who are you?'], answer:0,
+   tip:'か (ka) at the end turns a sentence into a question, like a spoken question mark.'},
+  {t:'build', src:'I am Alex', answer:['わたし|watashi','は|wa','アレックス|Arekkusu','です|desu'], extra:['か|ka','を|o'],
+   tip:'は is pronounced “wa” when it marks the topic. Foreign names are written in katakana: アレックス (Arekkusu).'},
+  {t:'convo', npc:'Yui', npcEmoji:'👩🏻', scene:'Meeting someone at a hostel in Kyoto',
+   tip:'You just held your first real conversation in Japanese!',
+   turns:[
+    {npc:'こんにちは！ゆいです。お名前は？|Konnichiwa! Yui desu. O-namae wa?', en:'Hi! I’m Yui. What’s your name?', choices:[
+      {es:'二十歳です。|Hatachi desu.', fb:'That means “I’m 20 years old”. She asked your name!'},
+      {es:'アレックスです。|Arekkusu desu.', ok:true},
+      {es:'さようなら。|Sayōnara.', fb:'You just said goodbye before saying hello! 😄'}]},
+    {npc:'よろしくお願いします！|Yoroshiku onegaishimasu!', en:'Nice to meet you!', choices:[
+      {es:'こちらこそ、よろしく！|Kochira koso, yoroshiku!', ok:true},
+      {es:'すみません。|Sumimasen.', fb:'すみません means “excuse me” or “sorry”. Reply with こちらこそ (kochira koso), “likewise!”.'}]},
+    {npc:'じゃあ、またね！|Jā, mata ne!', en:'Well, see you!', choices:[
+      {es:'お名前は？|O-namae wa?', fb:'You already know her name: Yui!'},
+      {es:'またね！|Mata ne!', ok:true}]}
+   ]}
+  ]},
+{ id:'cafe', title:'At the Café', emoji:'☕', color:'#C0763A',
+  desc:'Order, ask the price, and pay. Ends with ordering from Kenta at a café in Tokyo.',
+  words:['コーヒー|kōhī','ください|kudasai','いくら？|ikura?','お会計|o-kaikei'],
+  ex:[
+  {t:'choice', prompt:'Which one is “coffee”?', options:[{e:'💧',w:'水|mizu'},{e:'☕',w:'コーヒー|kōhī'},{e:'🍙',w:'おにぎり|onigiri'},{e:'🍵',w:'お茶|ocha'}], answer:1,
+   tip:'Borrowed words are written in katakana, like コーヒー (kōhī) from “coffee”.'},
+  {t:'listen', say:'お水をください|O-mizu o kudasai', options:['A coffee, please','Water, please','The bill, please'], answer:1,
+   tip:'[thing] をください (o kudasai) = “[thing], please”. Water is free in Japanese restaurants.'},
+  {t:'build', src:'A coffee, please', answer:['コーヒー|kōhī','を|o','ください|kudasai'], extra:['お茶|ocha','は|wa'],
+   tip:'を (o) marks the thing you want. The order is thing + を + ください.'},
+  {t:'match', pairs:[['コーヒー|kōhī','coffee'],['ミルク|miruku','milk'],['お茶|ocha','tea'],['お会計|o-kaikei','the bill'],['水|mizu','water']]},
+  {t:'choice', prompt:'What does this mean?', es:'いくらですか？|Ikura desu ka?', options:['What time is it?','How much is it?','Where is it?'], answer:1,
+   tip:'いくら (ikura) = how much. Prices are in yen: 五百円 (gohyaku en) = ¥500.'},
+  {t:'listen', say:'お会計お願いします|O-kaikei onegaishimasu', options:['The menu, please','A table, please','The bill, please'], answer:2,
+   tip:'There’s no tipping in Japan! You usually pay at the register by the door.'},
+  {t:'convo', npc:'Kenta', npcEmoji:'👨🏻', scene:'Ordering at a café in Tokyo',
+   tip:'Order placed and paid, all in Japanese. ☕',
+   turns:[
+    {npc:'いらっしゃいませ！ご注文は？|Irasshaimase! Go-chūmon wa?', en:'Welcome! What would you like?', choices:[
+      {es:'元気です。|Genki desu.', fb:'That’s “I’m fine”. He wants your order!'},
+      {es:'お会計お願いします。|O-kaikei onegaishimasu.', fb:'You haven’t ordered yet. That asks for the bill.'},
+      {es:'コーヒーをください。|Kōhī o kudasai.', ok:true}]},
+    {npc:'店内でお召し上がりですか？|Tennai de o-meshiagari desu ka?', en:'Will you have it here?', choices:[
+      {es:'ミルクです。|Miruku desu.', fb:'He asked if it’s for here. Say はい (hai) for yes, or 持ち帰り (mochikaeri) for takeaway.'},
+      {es:'いいえ、持ち帰りで。|Iie, mochikaeri de.', ok:true}]},
+    {npc:'五百円です。|Gohyaku en desu.', en:'That’s 500 yen.', choices:[
+      {es:'はい、どうぞ。|Hai, dōzo.', ok:true},
+      {es:'お名前は？|O-namae wa?', fb:'Maybe not the moment to ask his name. 😅 Pay first!'}]}
+   ]}
+  ]},
+{ id:'around', title:'Getting Around', emoji:'🧭', color:'#2A9D8F',
+  desc:'Ask where things are and understand directions. Ends with asking a stranger for help in Osaka.',
+  words:['どこ？|doko?','左|hidari','右|migi','まっすぐ|massugu'],
+  ex:[
+  {t:'choice', prompt:'Which one is “the station”?', options:[{e:'🏨',w:'ホテル|hoteru'},{e:'🌊',w:'海|umi'},{e:'🚉',w:'駅|eki'},{e:'🏥',w:'病院|byōin'}], answer:2,
+   tip:'駅 (eki) = station. You’ll see it everywhere: 東京駅 (Tōkyō-eki) is Tokyo Station.'},
+  {t:'choice', prompt:'What does this mean?', es:'トイレはどこですか？|Toire wa doko desu ka?', options:['Is this the toilet?','Where is the toilet?','When does the toilet open?'], answer:1,
+   tip:'どこ (doko) = where. Pattern: [place] は どこですか？'},
+  {t:'build', src:'Please turn left', answer:['左|hidari','に|ni','曲がって|magatte','ください|kudasai'], extra:['右|migi','まっすぐ|massugu'],
+   tip:'左 (hidari) = left, 右 (migi) = right. ～てください (te kudasai) makes a polite request.'},
+  {t:'listen', say:'まっすぐ|Massugu', options:['On the right','Straight ahead','Behind you'], answer:1,
+   tip:'まっすぐ (massugu) = straight ahead. It’s often followed by 行ってください (itte kudasai), “please go”.'},
+  {t:'match', pairs:[['左|hidari','left'],['右|migi','right'],['近い|chikai','near'],['遠い|tōi','far'],['ここ|koko','here']]},
+  {t:'build', src:'Is it far?', answer:['遠い|tōi','です|desu','か|ka'], extra:['近い|chikai','どこ|doko'],
+   tip:'No need to change the word order: just add か (ka) to the end to make a question.'},
+  {t:'convo', npc:'Tanaka-san', npcEmoji:'👴🏻', scene:'Lost in Osaka',
+   tip:'You found your way without opening a map app. 🧭',
+   turns:[
+    {npc:'大丈夫ですか？|Daijōbu desu ka?', en:'Are you OK?', choices:[
+      {es:'すみません、駅はどこですか？|Sumimasen, eki wa doko desu ka?', ok:true},
+      {es:'コーヒーをください。|Kōhī o kudasai.', fb:'He’s a helpful stranger, not a barista! ☕'}]},
+    {npc:'まっすぐ行って、右に曲がってください。|Massugu itte, migi ni magatte kudasai.', en:'Go straight, then turn right.', choices:[
+      {es:'お元気ですか？|O-genki desu ka?', fb:'Ask about the directions instead: is it far?'},
+      {es:'遠いですか？|Tōi desu ka?', ok:true}]},
+    {npc:'いいえ、近いですよ。五分です。|Iie, chikai desu yo. Go-fun desu.', en:'No, it’s close. Five minutes.', choices:[
+      {es:'左に曲がってください。|Hidari ni magatte kudasai.', fb:'Now you’re giving him directions! Just thank him.'},
+      {es:'ありがとうございます！|Arigatō gozaimasu!', ok:true}]}
+   ]}
+  ]},
+{ id:'friends', title:'Making Friends', emoji:'🎉', color:'#E76FAE',
+  desc:'Talk about where you’re from and what you like. Ends with making weekend plans.',
+  words:['友達|tomodachi','好き|suki','どこから？|doko kara?','行きませんか？|ikimasen ka?'],
+  ex:[
+  {t:'choice', prompt:'Which one is “friend”?', options:[{e:'🐶',w:'犬|inu'},{e:'🧑‍🤝‍🧑',w:'友達|tomodachi'},{e:'🏠',w:'家|ie'},{e:'📚',w:'本|hon'}], answer:1,
+   tip:'友達 (tomodachi) = friend. You’ll hear it in almost every anime!'},
+  {t:'build', src:'I like music', answer:['音楽|ongaku','が|ga','好き|suki','です|desu'], extra:['は|wa','嫌い|kirai'],
+   tip:'好き (suki) works like an adjective, so it’s really “music is liked”. The thing you like takes が (ga).'},
+  {t:'listen', say:'どこから来ましたか？|Doko kara kimashita ka?', options:['Where are you going?','Where do you live?','Where are you from?'], answer:2,
+   tip:'Literally “where did you come from?”. Answer: [country] から来ました (kara kimashita).'},
+  {t:'match', pairs:[['犬|inu','dog'],['猫|neko','cat'],['音楽|ongaku','music'],['本|hon','book'],['海|umi','sea']]},
+  {t:'choice', prompt:'How do you say “I’m from Australia”?', options:['オーストラリアに行きます|Ōsutoraria ni ikimasu','オーストラリアから来ました|Ōsutoraria kara kimashita','オーストラリアが好きです|Ōsutoraria ga suki desu'], answer:1,
+   tip:'から (kara) = from, 来ました (kimashita) = came. The first option means “I’m going to Australia”.'},
+  {t:'build', src:'Do you want to go to the sea?', answer:['海|umi','に|ni','行きません|ikimasen','か|ka'], extra:['家|ie','行きます|ikimasu'],
+   tip:'Japanese invites with a negative question: 行きませんか？ (“won’t you go?”) sounds friendly, not pushy.'},
+  {t:'convo', npc:'Haruto', npcEmoji:'🧑🏻', scene:'At a friend’s party',
+   tip:'New friend unlocked. Sea trip on Saturday! 🌊',
+   turns:[
+    {npc:'こんにちは！どこから来ましたか？|Konnichiwa! Doko kara kimashita ka?', en:'Hi! Where are you from?', choices:[
+      {es:'オーストラリアに行きます。|Ōsutoraria ni ikimasu.', fb:'That means “I’m going to Australia”. Use から来ました (kara kimashita).'},
+      {es:'オーストラリアから来ました。|Ōsutoraria kara kimashita.', ok:true}]},
+    {npc:'そうですか！何が好きですか？|Sō desu ka! Nani ga suki desu ka?', en:'Oh really! What do you like?', choices:[
+      {es:'音楽と海が好きです。|Ongaku to umi ga suki desu.', ok:true},
+      {es:'音楽を好きです。|Ongaku o suki desu.', fb:'With 好き (suki), the thing you like takes が (ga), not を (o).'}]},
+    {npc:'僕も！土曜日、海に行きませんか？|Boku mo! Doyōbi, umi ni ikimasen ka?', en:'Me too! Want to go to the sea on Saturday?', choices:[
+      {es:'お会計お願いします。|O-kaikei onegaishimasu.', fb:'Ha, wrong scene! He’s inviting you to the sea.'},
+      {es:'いいですね！|Ii desu ne!', ok:true}]}
+   ]}
+  ]}
+]},
+
+ko:{ name:'Korean', flag:'🇰🇷', voice:'ko-KR', hello:'안녕하세요!|Annyeonghaseyo!', unit:'Survive your first trip', group:'East Asian languages', rom:true, lessons:[
+{ id:'greet', title:'First Hellos', emoji:'👋', color:'#FF6B4A',
+  desc:'Say hi, introduce yourself, and finish with a real chat with Minji at a hostel in Seoul.',
+  words:['안녕하세요|annyeonghaseyo','감사합니다|gamsahamnida','잘 지내요?|jal jinaeyo?','제 이름은|je ireumeun'],
+  ex:[
+  {t:'choice', prompt:'Which one means “hello”?', options:[{e:'👋',w:'안녕하세요|annyeonghaseyo'},{e:'🚪',w:'안녕히 가세요|annyeonghi gaseyo'},{e:'🙏',w:'감사합니다|gamsahamnida'},{e:'🙇',w:'죄송합니다|joesonghamnida'}], answer:0,
+   tip:'안녕하세요 works any time of day. With close friends, just say 안녕 (annyeong).'},
+  {t:'listen', say:'감사합니다|Gamsahamnida', options:['Thank you','Sorry','Hello'], answer:0,
+   tip:'감사합니다 is the polite thank-you. 고마워요 (gomawoyo) is a softer, friendlier version.'},
+  {t:'build', src:'Nice to meet you', answer:['만나서|mannaseo','반가워요|bangawoyo'], extra:['안녕|annyeong','네|ne'],
+   tip:'Literally “meeting you, I’m glad”. Use it right after introductions.'},
+  {t:'match', pairs:[['안녕하세요|annyeonghaseyo','hello'],['감사합니다|gamsahamnida','thank you'],['네|ne','yes'],['아니요|aniyo','no'],['죄송합니다|joesonghamnida','sorry']]},
+  {t:'choice', prompt:'What does this mean?', es:'잘 지내요?|Jal jinaeyo?', options:['How are you?','Where are you?','Who are you?'], answer:0,
+   tip:'Literally “are you getting along well?”. The answer: 네, 잘 지내요 (ne, jal jinaeyo).'},
+  {t:'build', src:'My name is Alex', answer:['제|je','이름은|ireumeun','알렉스예요|Allekseu-yeyo'], extra:['저는|jeoneun','뭐예요|mwoyeyo'],
+   tip:'After a name ending in a vowel, add 예요 (yeyo). After a consonant, add 이에요 (ieyo).'},
+  {t:'convo', npc:'Minji', npcEmoji:'👩🏻', scene:'Meeting someone at a hostel in Seoul',
+   tip:'You just held your first real conversation in Korean!',
+   turns:[
+    {npc:'안녕하세요! 저는 민지예요. 이름이 뭐예요?|Annyeonghaseyo! Jeoneun Minji-yeyo. Ireumi mwoyeyo?', en:'Hi! I’m Minji. What’s your name?', choices:[
+      {es:'스무 살이에요.|Seumu sarieyo.', fb:'That means “I’m 20 years old”. She asked your name!'},
+      {es:'제 이름은 알렉스예요.|Je ireumeun Allekseu-yeyo.', ok:true},
+      {es:'안녕히 가세요.|Annyeonghi gaseyo.', fb:'You just said goodbye before saying hello! 😄'}]},
+    {npc:'만나서 반가워요! 잘 지내요?|Mannaseo bangawoyo! Jal jinaeyo?', en:'Nice to meet you! How are you?', choices:[
+      {es:'네, 잘 지내요. 민지 씨는요?|Ne, jal jinaeyo. Minji ssi-neunyo?', ok:true},
+      {es:'제 이름은 잘 지내요.|Je ireumeun jal jinaeyo.', fb:'“Je ireumeun” is only for your name!'}]},
+    {npc:'좋아요! 나중에 봐요.|Joayo! Najunge bwayo.', en:'Great! See you later.', choices:[
+      {es:'이름이 뭐예요?|Ireumi mwoyeyo?', fb:'You already know her name: Minji!'},
+      {es:'네, 나중에 봐요!|Ne, najunge bwayo!', ok:true}]}
+   ]}
+  ]},
+{ id:'cafe', title:'At the Café', emoji:'☕', color:'#C0763A',
+  desc:'Order, ask the price, and pay. Ends with ordering from Junho at a café in Seoul.',
+  words:['커피|keopi','주세요|juseyo','얼마예요?|eolmayeyo?','포장|pojang'],
+  ex:[
+  {t:'choice', prompt:'Which one is “coffee”?', options:[{e:'💧',w:'물|mul'},{e:'☕',w:'커피|keopi'},{e:'🍩',w:'도넛|doneot'},{e:'🍵',w:'차|cha'}], answer:1,
+   tip:'Korea loves coffee! 아메리카노 (amerikano) is the most popular order.'},
+  {t:'listen', say:'물 주세요|Mul juseyo', options:['Coffee, please','Water, please','The bill, please'], answer:1,
+   tip:'[thing] 주세요 (juseyo) = “[thing], please”. It’s the most useful phrase in Korea.'},
+  {t:'build', src:'An iced americano, please', answer:['아이스|aiseu','아메리카노|amerikano','주세요|juseyo'], extra:['물|mul','네|ne'],
+   tip:'Korean puts the verb last: “iced americano please-give”.'},
+  {t:'match', pairs:[['커피|keopi','coffee'],['우유|uyu','milk'],['차|cha','tea'],['계산|gyesan','paying'],['물|mul','water']]},
+  {t:'choice', prompt:'What does this mean?', es:'얼마예요?|Eolmayeyo?', options:['What time is it?','How much is it?','Where is it?'], answer:1,
+   tip:'얼마 (eolma) = how much. Prices are in won: 오천 원 (ocheon won) = ₩5,000.'},
+  {t:'listen', say:'계산해 주세요|Gyesanhae juseyo', options:['The menu, please','A table, please','The bill, please'], answer:2,
+   tip:'Literally “please calculate”. In most Korean cafés, you order and pay at the counter first.'},
+  {t:'convo', npc:'Junho', npcEmoji:'👨🏻', scene:'Ordering at a café in Seoul',
+   tip:'Order placed and paid, all in Korean. ☕',
+   turns:[
+    {npc:'어서 오세요! 뭐 드릴까요?|Eoseo oseyo! Mwo deurilkkayo?', en:'Welcome! What can I get you?', choices:[
+      {es:'잘 지내요.|Jal jinaeyo.', fb:'That’s “I’m doing well”. He wants your order!'},
+      {es:'계산해 주세요.|Gyesanhae juseyo.', fb:'You haven’t ordered yet. That asks for the bill.'},
+      {es:'아이스 아메리카노 주세요.|Aiseu amerikano juseyo.', ok:true}]},
+    {npc:'드시고 가세요?|Deusigo gaseyo?', en:'Is it for here?', choices:[
+      {es:'우유요.|Uyuyo.', fb:'He asked if it’s for here. “Takeout” is 포장 (pojang).'},
+      {es:'아니요, 포장이요.|Aniyo, pojang-iyo.', ok:true}]},
+    {npc:'오천 원입니다.|Ocheon wonimnida.', en:'That’s 5,000 won.', choices:[
+      {es:'여기요. 감사합니다!|Yeogiyo. Gamsahamnida!', ok:true},
+      {es:'이름이 뭐예요?|Ireumi mwoyeyo?', fb:'Maybe not the moment to ask his name. 😅 Pay first!'}]}
+   ]}
+  ]},
+{ id:'around', title:'Getting Around', emoji:'🧭', color:'#2A9D8F',
+  desc:'Ask where things are and understand directions. Ends with asking a halmeoni for help in Busan.',
+  words:['어디예요?|eodiyeyo?','왼쪽|oenjjok','오른쪽|oreunjjok','쭉|jjuk'],
+  ex:[
+  {t:'choice', prompt:'Which one is “the station”?', options:[{e:'🏨',w:'호텔|hotel'},{e:'🌊',w:'바다|bada'},{e:'🚉',w:'역|yeok'},{e:'🏥',w:'병원|byeongwon'}], answer:2,
+   tip:'역 (yeok) = station. Subway station names end in 역, like 서울역 (Seoul-yeok).'},
+  {t:'choice', prompt:'What does this mean?', es:'화장실 어디예요?|Hwajangsil eodiyeyo?', options:['Is this the bathroom?','Where is the bathroom?','When does the bathroom open?'], answer:1,
+   tip:'어디 (eodi) = where. Pattern: [place] 어디예요?'},
+  {t:'build', src:'Please go left', answer:['왼쪽으로|oenjjogeuro','가세요|gaseyo'], extra:['오른쪽으로|oreunjjogeuro','여기|yeogi'],
+   tip:'왼쪽 (oenjjok) = left, 오른쪽 (oreunjjok) = right. 으로 (euro) means “towards”.'},
+  {t:'listen', say:'쭉 가세요|Jjuk gaseyo', options:['Go right','Go straight ahead','Go back'], answer:1,
+   tip:'쭉 (jjuk) = straight on. You’ll also hear 직진 (jikjin), which drivers use.'},
+  {t:'match', pairs:[['왼쪽|oenjjok','left'],['오른쪽|oreunjjok','right'],['가까워요|gakkawoyo','it’s near'],['멀어요|meoreoyo','it’s far'],['여기|yeogi','here']]},
+  {t:'build', src:'Is it far from here?', answer:['여기서|yeogiseo','멀어요?|meoreoyo?'], extra:['가까워요|gakkawoyo','어디|eodi'],
+   tip:'Korean questions often look like statements. Just raise your voice at the end: 멀어요? (is it far?)'},
+  {t:'convo', npc:'Halmeoni', npcEmoji:'👵🏻', scene:'Lost in Busan',
+   tip:'You found your way without opening a map app. 🧭',
+   turns:[
+    {npc:'괜찮아요? 도와줄까요?|Gwaenchanayo? Dowajulkkayo?', en:'Are you OK? Shall I help you?', choices:[
+      {es:'네, 역 어디예요?|Ne, yeok eodiyeyo?', ok:true},
+      {es:'아이스 아메리카노 주세요.|Aiseu amerikano juseyo.', fb:'She’s a helpful stranger, not a barista! ☕'}]},
+    {npc:'쭉 가서 오른쪽으로 가세요.|Jjuk gaseo oreunjjogeuro gaseyo.', en:'Go straight, then go right.', choices:[
+      {es:'잘 지내요?|Jal jinaeyo?', fb:'Ask about the directions instead: is it far?'},
+      {es:'여기서 멀어요?|Yeogiseo meoreoyo?', ok:true}]},
+    {npc:'아니요, 가까워요. 오 분이에요.|Aniyo, gakkawoyo. O bunieyo.', en:'No, it’s close. Five minutes.', choices:[
+      {es:'왼쪽으로 가세요.|Oenjjogeuro gaseyo.', fb:'Now you’re giving her directions! Just thank her.'},
+      {es:'정말 감사합니다!|Jeongmal gamsahamnida!', ok:true}]}
+   ]}
+  ]},
+{ id:'friends', title:'Making Friends', emoji:'🎉', color:'#E76FAE',
+  desc:'Talk about where you’re from and what you like. Ends with making weekend plans.',
+  words:['친구|chingu','좋아해요|joahaeyo','어디에서 왔어요?|eodieseo wasseoyo?','갈래요?|gallaeyo?'],
+  ex:[
+  {t:'choice', prompt:'Which one is “friend”?', options:[{e:'🐶',w:'강아지|gangaji'},{e:'🧑‍🤝‍🧑',w:'친구|chingu'},{e:'🏠',w:'집|jip'},{e:'📚',w:'책|chaek'}], answer:1,
+   tip:'친구 (chingu) is a friend your own age. In Korea, age matters a lot in friendships!'},
+  {t:'build', src:'I like music', answer:['저는|jeoneun','음악을|eumageul','좋아해요|joahaeyo'], extra:['싫어해요|sireohaeyo','친구|chingu'],
+   tip:'The verb goes last again: “I music like”. 을/를 (eul/reul) marks the thing you like.'},
+  {t:'listen', say:'어디에서 왔어요?|Eodieseo wasseoyo?', options:['Where are you going?','Where do you live?','Where are you from?'], answer:2,
+   tip:'Literally “where did you come from?”. Answer: [country]에서 왔어요 (eseo wasseoyo).'},
+  {t:'match', pairs:[['강아지|gangaji','puppy'],['고양이|goyangi','cat'],['음악|eumak','music'],['책|chaek','book'],['바다|bada','sea']]},
+  {t:'choice', prompt:'How do you say “I’m from Australia”?', options:['호주에 가요|Hoju-e gayo','호주에서 왔어요|Hoju-eseo wasseoyo','호주 좋아해요|Hoju joahaeyo'], answer:1,
+   tip:'호주 (Hoju) = Australia, 에서 (eseo) = from. The first option means “I’m going to Australia”.'},
+  {t:'build', src:'Wanna go to the beach?', answer:['바다에|bada-e','갈래요?|gallaeyo?'], extra:['집에|jibe','왔어요|wasseoyo'],
+   tip:'갈래요? (gallaeyo?) is a casual, friendly way to invite someone: “wanna go?”.'},
+  {t:'convo', npc:'Seojun', npcEmoji:'🧑🏻', scene:'At a friend’s party',
+   tip:'New friend unlocked. Beach on Saturday! 🏖️',
+   turns:[
+    {npc:'안녕하세요! 어디에서 왔어요?|Annyeonghaseyo! Eodieseo wasseoyo?', en:'Hi! Where are you from?', choices:[
+      {es:'호주에 가요.|Hoju-e gayo.', fb:'That means “I’m going to Australia”. Use 에서 왔어요 (eseo wasseoyo).'},
+      {es:'호주에서 왔어요.|Hoju-eseo wasseoyo.', ok:true}]},
+    {npc:'와! 뭐 좋아해요?|Wa! Mwo joahaeyo?', en:'Wow! What do you like?', choices:[
+      {es:'음악하고 바다를 좋아해요.|Eumakhago badareul joahaeyo.', ok:true},
+      {es:'음악을 싫어해요.|Eumageul sireohaeyo.', fb:'That means “I hate music”! Use 좋아해요 (joahaeyo).'}]},
+    {npc:'저도요! 토요일에 바다에 갈래요?|Jeodoyo! Toyoire bada-e gallaeyo?', en:'Me too! Wanna go to the beach on Saturday?', choices:[
+      {es:'계산해 주세요.|Gyesanhae juseyo.', fb:'Ha, wrong scene! He’s inviting you to the beach.'},
+      {es:'좋아요!|Joayo!', ok:true}]}
+   ]}
+  ]}
+]},
+
+zh:{ name:'Mandarin', flag:'🇨🇳', voice:'zh-CN', hello:'你好！|Nǐ hǎo!', unit:'Survive your first trip', group:'East Asian languages', rom:true, join:'', lessons:[
+{ id:'greet', title:'First Hellos', emoji:'👋', color:'#FF6B4A',
+  desc:'Say hi, introduce yourself, and finish with a real chat with Xiaoyu at a hostel in Shanghai.',
+  words:['你好|nǐ hǎo','谢谢|xièxie','你好吗？|nǐ hǎo ma?','我叫|wǒ jiào'],
+  ex:[
+  {t:'choice', prompt:'Which one means “hello”?', options:[{e:'👋',w:'你好|nǐ hǎo'},{e:'🚪',w:'再见|zàijiàn'},{e:'🙏',w:'谢谢|xièxie'},{e:'🙇',w:'对不起|duìbuqǐ'}], answer:0,
+   tip:'你好 (nǐ hǎo) literally means “you good”. Mandarin has 4 tones, and the marks over the letters show which one to use.'},
+  {t:'listen', say:'谢谢|Xièxie', options:['Thank you','Sorry','Goodbye'], answer:0,
+   tip:'The reply to thanks is 不客气 (bú kèqi), “you’re welcome”.'},
+  {t:'build', src:'Nice to meet you', answer:['很|hěn','高兴|gāoxìng','认识|rènshi','你|nǐ'], extra:['再见|zàijiàn','我|wǒ'],
+   tip:'Literally “very happy to know you”.'},
+  {t:'match', pairs:[['你好|nǐ hǎo','hello'],['再见|zàijiàn','goodbye'],['谢谢|xièxie','thank you'],['对不起|duìbuqǐ','sorry'],['好|hǎo','good']]},
+  {t:'choice', prompt:'What does this mean?', es:'你好吗？|Nǐ hǎo ma?', options:['How are you?','Where are you?','Who are you?'], answer:0,
+   tip:'Add 吗 (ma) to the end of any sentence to turn it into a yes/no question.'},
+  {t:'build', src:'My name is Alex', answer:['我|wǒ','叫|jiào','亚历克斯|Yàlìkèsī'], extra:['你|nǐ','是|shì'],
+   tip:'叫 (jiào) = to be called. Foreign names get a Chinese version based on how they sound: Alex → 亚历克斯.'},
+  {t:'convo', npc:'Xiaoyu', npcEmoji:'👩🏻', scene:'Meeting someone at a hostel in Shanghai',
+   tip:'You just held your first real conversation in Mandarin!',
+   turns:[
+    {npc:'你好！我叫小雨。你叫什么名字？|Nǐ hǎo! Wǒ jiào Xiǎoyǔ. Nǐ jiào shénme míngzi?', en:'Hi! I’m Xiaoyu. What’s your name?', choices:[
+      {es:'我二十岁。|Wǒ èrshí suì.', fb:'That means “I’m 20 years old”. She asked your name. Try 我叫… (wǒ jiào…).'},
+      {es:'我叫亚历克斯。|Wǒ jiào Yàlìkèsī.', ok:true},
+      {es:'再见！|Zàijiàn!', fb:'You just said goodbye before saying hello! 😄'}]},
+    {npc:'很高兴认识你！你好吗？|Hěn gāoxìng rènshi nǐ! Nǐ hǎo ma?', en:'Nice to meet you! How are you?', choices:[
+      {es:'我很好，你呢？|Wǒ hěn hǎo, nǐ ne?', ok:true},
+      {es:'我叫很好。|Wǒ jiào hěn hǎo.', fb:'叫 (jiào) is only for names. Say 我很好 (wǒ hěn hǎo).'}]},
+    {npc:'太好了！回头见。|Tài hǎo le! Huítóu jiàn.', en:'Great! See you later.', choices:[
+      {es:'你叫什么名字？|Nǐ jiào shénme míngzi?', fb:'You already know her name: Xiaoyu!'},
+      {es:'回头见！|Huítóu jiàn!', ok:true}]}
+   ]}
+  ]},
+{ id:'cafe', title:'At the Café', emoji:'☕', color:'#C0763A',
+  desc:'Order, ask the price, and pay. Ends with ordering from Xiao Li at a café in Beijing.',
+  words:['咖啡|kāfēi','我要|wǒ yào','多少钱？|duōshao qián?','带走|dàizǒu'],
+  ex:[
+  {t:'choice', prompt:'Which one is “coffee”?', options:[{e:'💧',w:'水|shuǐ'},{e:'☕',w:'咖啡|kāfēi'},{e:'🥟',w:'包子|bāozi'},{e:'🍵',w:'茶|chá'}], answer:1,
+   tip:'咖啡 (kāfēi) sounds like “coffee”. Lots of borrowed words work this way.'},
+  {t:'listen', say:'我要一杯水|Wǒ yào yì bēi shuǐ', options:['I want a coffee','I want a glass of water','I want the bill'], answer:1,
+   tip:'杯 (bēi) is a measure word for cups and glasses. Mandarin needs one between a number and a noun.'},
+  {t:'build', src:'I want a coffee', answer:['我|wǒ','要|yào','一杯|yì bēi','咖啡|kāfēi'], extra:['茶|chá','你|nǐ'],
+   tip:'要 (yào) = want. The order is I + want + one cup + coffee.'},
+  {t:'match', pairs:[['咖啡|kāfēi','coffee'],['牛奶|niúnǎi','milk'],['茶|chá','tea'],['买单|mǎidān','pay the bill'],['水|shuǐ','water']]},
+  {t:'choice', prompt:'What does this mean?', es:'多少钱？|Duōshao qián?', options:['What time is it?','How much is it?','Where is it?'], answer:1,
+   tip:'Literally “how much money?”. Prices are in 块 (kuài), the everyday word for yuan.'},
+  {t:'listen', say:'服务员，买单！|Fúwùyuán, mǎidān!', options:['Waiter, the menu!','Waiter, a table!','Waiter, the bill!'], answer:2,
+   tip:'Calling out 服务员 (fúwùyuán, waiter) is totally normal in China. Many places also let you pay by scanning a QR code.'},
+  {t:'convo', npc:'Xiao Li', npcEmoji:'👨🏻', scene:'Ordering at a café in Beijing',
+   tip:'Order placed and paid, all in Mandarin. ☕',
+   turns:[
+    {npc:'你好！你要喝什么？|Nǐ hǎo! Nǐ yào hē shénme?', en:'Hi! What would you like to drink?', choices:[
+      {es:'我很好。|Wǒ hěn hǎo.', fb:'That’s “I’m fine”. He wants your order!'},
+      {es:'买单！|Mǎidān!', fb:'You haven’t ordered yet. That asks for the bill.'},
+      {es:'我要一杯咖啡。|Wǒ yào yì bēi kāfēi.', ok:true}]},
+    {npc:'在这儿喝还是带走？|Zài zhèr hē háishi dàizǒu?', en:'Drink here or take away?', choices:[
+      {es:'牛奶。|Niúnǎi.', fb:'He asked “here or to go?”. 带走 (dàizǒu) means take away.'},
+      {es:'带走，谢谢。|Dàizǒu, xièxie.', ok:true}]},
+    {npc:'二十五块。|Èrshíwǔ kuài.', en:'That’s 25 yuan.', choices:[
+      {es:'好的，给你。谢谢！|Hǎo de, gěi nǐ. Xièxie!', ok:true},
+      {es:'你叫什么名字？|Nǐ jiào shénme míngzi?', fb:'Maybe not the moment to ask his name. 😅 Pay first!'}]}
+   ]}
+  ]},
+{ id:'around', title:'Getting Around', emoji:'🧭', color:'#2A9D8F',
+  desc:'Ask where things are and understand directions. Ends with asking an auntie for help in Chengdu.',
+  words:['在哪儿？|zài nǎr?','左|zuǒ','右|yòu','一直走|yìzhí zǒu'],
+  ex:[
+  {t:'choice', prompt:'Which one is “the train station”?', options:[{e:'🏨',w:'酒店|jiǔdiàn'},{e:'🏖️',w:'海边|hǎibiān'},{e:'🚉',w:'火车站|huǒchēzhàn'},{e:'🏥',w:'医院|yīyuàn'}], answer:2,
+   tip:'火车 (huǒchē, train) literally means “fire car”, a name from the steam-engine days.'},
+  {t:'choice', prompt:'What does this mean?', es:'洗手间在哪儿？|Xǐshǒujiān zài nǎr?', options:['Is this the restroom?','Where is the restroom?','When is the restroom open?'], answer:1,
+   tip:'在哪儿 (zài nǎr) = where is. Pattern: [place] 在哪儿？'},
+  {t:'build', src:'Turn left', answer:['往|wǎng','左|zuǒ','拐|guǎi'], extra:['右|yòu','直走|zhí zǒu'],
+   tip:'左 (zuǒ) = left, 右 (yòu) = right. 往 (wǎng) means “towards”.'},
+  {t:'listen', say:'一直走|Yìzhí zǒu', options:['Turn right','Go straight ahead','Go back'], answer:1,
+   tip:'一直 (yìzhí) = straight on, 走 (zǒu) = walk.'},
+  {t:'match', pairs:[['左|zuǒ','left'],['右|yòu','right'],['近|jìn','near'],['远|yuǎn','far'],['这儿|zhèr','here']]},
+  {t:'build', src:'Is it far from here?', answer:['离|lí','这儿|zhèr','远|yuǎn','吗|ma'], extra:['近|jìn','哪儿|nǎr'],
+   tip:'离 (lí) = away from. Adding 吗 (ma) turns it into a question.'},
+  {t:'convo', npc:'Zhang Ayi', npcEmoji:'👵🏻', scene:'Lost in Chengdu',
+   tip:'You found your way without opening a map app. 🧭',
+   turns:[
+    {npc:'你好，需要帮忙吗？|Nǐ hǎo, xūyào bāngmáng ma?', en:'Hi, do you need help?', choices:[
+      {es:'火车站在哪儿？|Huǒchēzhàn zài nǎr?', ok:true},
+      {es:'我要一杯咖啡。|Wǒ yào yì bēi kāfēi.', fb:'She’s a helpful stranger, not a barista! ☕'}]},
+    {npc:'一直走，然后往右拐。|Yìzhí zǒu, ránhòu wǎng yòu guǎi.', en:'Go straight, then turn right.', choices:[
+      {es:'你好吗？|Nǐ hǎo ma?', fb:'Ask about the directions instead: is it far?'},
+      {es:'离这儿远吗？|Lí zhèr yuǎn ma?', ok:true}]},
+    {npc:'不远，很近。走五分钟。|Bù yuǎn, hěn jìn. Zǒu wǔ fēnzhōng.', en:'Not far, it’s close. Five minutes’ walk.', choices:[
+      {es:'往左拐。|Wǎng zuǒ guǎi.', fb:'Now you’re giving her directions! Just thank her.'},
+      {es:'太谢谢您了！|Tài xièxie nín le!', ok:true}]}
+   ]}
+  ]},
+{ id:'friends', title:'Making Friends', emoji:'🎉', color:'#E76FAE',
+  desc:'Talk about where you’re from and what you like. Ends with making weekend plans.',
+  words:['朋友|péngyou','喜欢|xǐhuan','哪国人？|nǎ guó rén?','想去|xiǎng qù'],
+  ex:[
+  {t:'choice', prompt:'Which one is “friend”?', options:[{e:'🐶',w:'狗|gǒu'},{e:'🧑‍🤝‍🧑',w:'朋友|péngyou'},{e:'🏠',w:'家|jiā'},{e:'📚',w:'书|shū'}], answer:1,
+   tip:'朋友 (péngyou) = friend. 好朋友 (hǎo péngyou) = good friend.'},
+  {t:'build', src:'I like music', answer:['我|wǒ','喜欢|xǐhuan','音乐|yīnyuè'], extra:['你|nǐ','不|bù'],
+   tip:'Same order as English: I + like + music. To say you don’t like it, add 不 (bù): 我不喜欢.'},
+  {t:'listen', say:'你是哪国人？|Nǐ shì nǎ guó rén?', options:['Where are you going?','Where do you live?','Where are you from?'], answer:2,
+   tip:'Literally “you are which-country person?”. Answer: 我是…人 (wǒ shì … rén).'},
+  {t:'match', pairs:[['狗|gǒu','dog'],['猫|māo','cat'],['音乐|yīnyuè','music'],['书|shū','book'],['海边|hǎibiān','beach']]},
+  {t:'choice', prompt:'How do you say “I’m Australian”?', options:['我去澳大利亚|Wǒ qù Àodàlìyà','我是澳大利亚人|Wǒ shì Àodàlìyà rén','我喜欢澳大利亚|Wǒ xǐhuan Àodàlìyà'], answer:1,
+   tip:'Country + 人 (rén, person) = nationality, so 澳大利亚人 = Australian. The first option means “I’m going to Australia”.'},
+  {t:'build', src:'Do you want to go to the beach?', answer:['你|nǐ','想|xiǎng','去|qù','海边|hǎibiān','吗|ma'], extra:['家|jiā','我|wǒ'],
+   tip:'想 (xiǎng) = would like to. And as always, 吗 (ma) at the end makes it a question.'},
+  {t:'convo', npc:'Dawei', npcEmoji:'🧑🏻', scene:'At a friend’s party',
+   tip:'New friend unlocked. Beach on Saturday! 🏖️',
+   turns:[
+    {npc:'你好！你是哪国人？|Nǐ hǎo! Nǐ shì nǎ guó rén?', en:'Hi! Where are you from?', choices:[
+      {es:'我去澳大利亚。|Wǒ qù Àodàlìyà.', fb:'That means “I’m going to Australia”. Try 我是…人 (wǒ shì … rén).'},
+      {es:'我是澳大利亚人。你呢？|Wǒ shì Àodàlìyà rén. Nǐ ne?', ok:true}]},
+    {npc:'我是北京人。你喜欢做什么？|Wǒ shì Běijīng rén. Nǐ xǐhuan zuò shénme?', en:'I’m from Beijing. What do you like doing?', choices:[
+      {es:'我喜欢音乐和海边。|Wǒ xǐhuan yīnyuè hé hǎibiān.', ok:true},
+      {es:'我不喜欢音乐。|Wǒ bù xǐhuan yīnyuè.', fb:'That means “I don’t like music”! He’s about to suggest something fun.'}]},
+    {npc:'我也是！星期六你想去海边吗？|Wǒ yě shì! Xīngqīliù nǐ xiǎng qù hǎibiān ma?', en:'Me too! Want to go to the beach on Saturday?', choices:[
+      {es:'买单！|Mǎidān!', fb:'Ha, wrong scene! He’s inviting you to the beach.'},
+      {es:'好啊！|Hǎo a!', ok:true}]}
+   ]}
+  ]}
+]}
+
+};
+function toggleRom(btn){
+  S.rom = S.rom===false; save();
+  if (btn) btn.classList.toggle('on', S.rom!==false);
+  if (run && run.state==='answer') drawEx();
+  toast(S.rom!==false ? 'Pronunciation on' : 'Pronunciation hidden. Read the script!');
+}
+const SOON = [['🇧🇩','Bengali'],['🇮🇳','Telugu'],['🇹🇭','Thai'],['🇻🇳','Vietnamese'],['🇮🇹','Italian']];
+
+const FEATS = [
+ ['🌍','8 languages, 3 continents','Spanish, French and German, plus Hindi and Tamil, plus Japanese, Korean and Mandarin. Switch any time with the flag button. Each course keeps its own progress and review deck.'],
+ ['🔤','Script training wheels','Languages with their own script show pronunciation under every word (romaji, pinyin and so on). Tap “Aa” to hide it when you’re ready to read for real.'],
+ ['🏙️','Culturally local scenes','Chai stalls in Delhi, filter coffee in Madurai, cafés in Seoul. Each course is set where the language is spoken, not translated from English.'],
+ ['💬','Real conversations, not random sentences','Every lesson ends with a branching chat in a real situation: ordering coffee, asking directions, making friends. No more “the bear drinks wine”.'],
+ ['💡','Every mistake explained','Wrong answers show a short “Why?” grammar note, so you learn the rule and don’t just memorise the fix.'],
+ ['❤️','No hearts, no lockouts','You can never run out of lives or get blocked mid-lesson. Mistakes turn into review cards, not punishments.'],
+ ['🧠','Smart Review (spaced repetition)','Each card you miss comes back until you get it right 3 times, then it graduates. Review targets your weak spots, not random old lessons.'],
+ ['🔥','Combo XP','Three right answers in a row doubles your XP, so you’re rewarded for focus, not for grinding easy lessons.'],
+ ['🐢','Native audio with slow mode','Every phrase can be played, and slowed down, with one tap.'],
+ ['🎯','Flexible daily goal','Tap the ring to set 10–50 XP a day. Your goal fits your life, not the other way round.']
+];
+const ROADMAP = [
+ ['🤖','AI conversation partner','Free-form chat with an AI character that adapts to your level and corrects you gently.'],
+ ['🎙️','Pronunciation scoring','Speak your answer and get per-sound feedback.'],
+ ['📸','Learn from your world','Point your camera at a menu or sign and get a lesson built from it.'],
+ ['👯','Study squads','Small friend groups with shared goals instead of anonymous leaderboards.']
+];
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const O = o => typeof o === 'string' ? {w:o} : o;
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]} return a; };
+const norm = s => s.toLowerCase().replace(/[¿?¡!.,。？！，、।]/g,'').replace(/\s+/g,' ').trim();
+// target-language strings may carry pronunciation after a "|":  "こんにちは|konnichiwa"
+const sp = s => { s = s||''; const i = s.indexOf('|'); return i<0 ? {t:s, r:''} : {t:s.slice(0,i), r:s.slice(i+1)}; };
+const TX = s => sp(s).t;
+const TL = s => { const {t,r} = sp(s); return r && S.rom!==false ? `<span class="tl">${t}<small class="rom">${r}</small></span>` : t; };
+const today = () => new Date().toLocaleDateString('en-CA');
+const ALL = {};
+Object.entries(COURSES).forEach(([lang,C]) => C.lessons.forEach(L => {
+  L.key = lang+'_'+L.id;
+  L.ex.forEach((e,k) => { e.id = L.key+'-'+k; e.lang = lang; ALL[e.id] = e; });
+}));
+const course = () => COURSES[S.lang] || COURSES.es;
+
+const MASCOT = (cls='') => `<svg class="${cls}" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8c24 0 42 15 42 36S74 80 50 80c-5 0-9-.5-13-1.5L16 90l6-17C13 66 8 56 8 44 8 23 26 8 50 8z" fill="#FF6B4A"/><path d="M50 8c24 0 42 15 42 36 0 6-1.5 11-4 16C84 40 70 24 50 22 33 20 18 28 11 40 13 22 30 8 50 8z" fill="#FF8A6E"/><ellipse cx="37" cy="44" rx="8" ry="10" fill="#fff"/><ellipse cx="63" cy="44" rx="8" ry="10" fill="#fff"/><circle cx="39" cy="46" r="4.5" fill="#1F1B2E"/><circle cx="65" cy="46" r="4.5" fill="#1F1B2E"/><circle cx="40.5" cy="44.5" r="1.5" fill="#fff"/><circle cx="66.5" cy="44.5" r="1.5" fill="#fff"/><path d="M41 61q9 8 18 0" stroke="#1F1B2E" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="27" cy="58" r="4" fill="#FFB3A1"/><circle cx="73" cy="58" r="4" fill="#FFB3A1"/></svg>`;
+
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('sayso-'+k); return v?JSON.parse(v):d; }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem('sayso-'+k, JSON.stringify(v)); }catch(e){} }
+};
+let S = Object.assign({xp:0,today:0,todayDate:'',streak:0,last:'',done:[],mistakes:{},goal:30,unlockAll:false,lang:''}, store.get('state',{}));
+const save = () => store.set('state', S);
+// migrate progress saved by the Spanish-only version
+if (S.done.some(d=>!d.includes('_')) || Object.keys(S.mistakes).some(k=>!k.includes('_'))) {
+  S.done = S.done.map(d => d.includes('_') ? d : 'es_'+d);
+  const m = {}; Object.entries(S.mistakes).forEach(([k,v]) => m[k.includes('_')?k:'es_'+k] = v); S.mistakes = m;
+  if (!S.lang) S.lang = 'es';
+  save();
+}
+if (S.todayDate !== today()) { S.today = 0; S.todayDate = today(); save(); }
+
+let tab = 'learn';
+let run = null;
+
+function say(text, slow){
+  try{
+    const u = new SpeechSynthesisUtterance(TX(text));
+    const C = course();
+    u.lang = C.voice; u.rate = slow ? 0.55 : 0.92;
+    const v = speechSynthesis.getVoices().find(v => v.lang.toLowerCase().startsWith(C.voice.slice(0,2)));
+    if (v) u.voice = v;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){}
+}
+let AC;
+function tone(notes, type, vol){
+  try{
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const t = AC.currentTime;
+    notes.forEach((f,i) => {
+      const o = AC.createOscillator(), g = AC.createGain();
+      o.type = type; o.frequency.value = f;
+      const s = t + i*0.09;
+      g.gain.setValueAtTime(0.0001, s);
+      g.gain.exponentialRampToValueAtTime(vol, s+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, s+0.2);
+      o.connect(g).connect(AC.destination); o.start(s); o.stop(s+0.22);
+    });
+  }catch(e){}
+}
+const sfx = ok => ok ? tone([660,880],'sine',0.18) : tone([233,196],'triangle',0.15);
+const sfxWin = () => tone([523,659,784,1047],'sine',0.16);
+
+function toast(msg){
+  const t = document.createElement('div'); t.className='toast'; t.textContent=msg;
+  app.appendChild(t); setTimeout(()=>t.remove(), 1800);
+}
+function overlay(html){
+  closeOv();
+  const o = document.createElement('div'); o.className='ov'; o.id='ov';
+  o.innerHTML = `<div class="sheet">${html}</div>`;
+  o.addEventListener('click', e => { if(e.target===o) closeOv(); });
+  app.appendChild(o);
+}
+function closeOv(){ const o=$('#ov'); if(o) o.remove(); }
+function confetti(){
+  const cols = ['#FF6B4A','#6C5CE7','#FFB703','#22A866','#E76FAE','#2A9D8F'];
+  for(let i=0;i<70;i++){
+    const c = document.createElement('div'); c.className='cf';
+    c.style.left = Math.random()*100+'%';
+    c.style.background = cols[i%cols.length];
+    c.style.setProperty('--x', (Math.random()*160-80)+'px');
+    c.style.setProperty('--r', (Math.random()*900-450)+'deg');
+    c.style.setProperty('--d', (1.6+Math.random()*1.6)+'s');
+    c.style.animationDelay = Math.random()*0.4+'s';
+    app.appendChild(c); setTimeout(()=>c.remove(), 3800);
+  }
+}
+
+/* ---------- streak, goal, review ---------- */
+function shownStreak(){
+  const y = new Date(Date.now()-864e5).toLocaleDateString('en-CA');
+  return (S.last===today() || S.last===y) ? S.streak : 0;
+}
+function bumpStreak(){
+  const t = today(); if (S.last === t) return;
+  const y = new Date(Date.now()-864e5).toLocaleDateString('en-CA');
+  S.streak = S.last===y ? S.streak+1 : 1; S.last = t;
+}
+function cycleGoal(){
+  const g=[10,20,30,50]; S.goal = g[(g.indexOf(S.goal)+1)%g.length]; save();
+  renderHome(); toast(`🎯 Daily goal: ${S.goal} XP`);
+}
+function addMistake(id){ S.mistakes[id] = {box:0, due:Date.now()}; save(); }
+function promote(id){
+  const m = S.mistakes[id]; if(!m) return;
+  m.box++;
+  if (m.box >= 3) delete S.mistakes[id];
+  else m.due = Date.now() + [0, 60e3, 10*60e3][m.box];   // demo-friendly intervals
+  save();
+}
+const dueList = () => Object.keys(S.mistakes).filter(id => ALL[id] && ALL[id].lang===S.lang && S.mistakes[id].due <= Date.now());
+// build answers: a plain sentence (split on spaces) or an explicit token array (for scripts without spaces)
+function answerToks(e){
+  if (Array.isArray(e.answer)) return [...e.answer];
+  // keep a lone "?" or "!" (French spacing) attached to the word before it
+  return e.answer.split(' ').reduce((a,t) => { if(/^[?!]$/.test(t) && a.length) a[a.length-1] += ' '+t; else a.push(t); return a; }, []);
+}
+function buildAnswer(e){   // "text|pronunciation" for the whole sentence
+  const toks = answerToks(e).map(sp), j = (COURSES[e.lang].join ?? ' ');
+  const r = toks.map(t=>t.r).filter(Boolean).join(' ');
+  return toks.map(t=>t.t).join(j) + (r ? '|'+r : '');
+}
+function label(e){
+  if(e.t==='build') return TL(buildAnswer(e));
+  if(e.t==='listen') return '🔊 '+TL(e.say);
+  if(e.t==='choice') return TL(e.es || O(e.options[e.answer]).w);
+  if(e.t==='match') return e.pairs.map(p=>TX(p[0])).join(' · ');
+  return '💬 Chat with '+e.npc;
+}
+
+/* ---------- home ---------- */
+function ringSvg(p){
+  const c = 2*Math.PI*15;
+  return `<svg viewBox="0 0 38 38"><circle cx="19" cy="19" r="15" fill="#fff" stroke="#EDE5DC" stroke-width="4"/><circle cx="19" cy="19" r="15" fill="none" stroke="#FFB703" stroke-width="4" stroke-linecap="round" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 19 19)"/></svg><span style="position:relative">🎯</span>`;
+}
+function langList(){
+  const groups = {};
+  Object.entries(COURSES).forEach(([k,C]) => (groups[C.group] = groups[C.group] || []).push([k,C]));
+  return Object.entries(groups).map(([g,list]) => `<div class="lgroup">${g}</div>` + list.map(([k,C]) => {
+    const n = C.lessons.filter(L => S.done.includes(L.key)).length;
+    const h = sp(C.hello);
+    return `<button class="lang ${S.lang===k?'on':''}" onclick="setLang('${k}')"><span class="fl">${C.flag}</span>
+      <span style="flex:1"><b>${C.name}</b><small>${n?`${n}/${C.lessons.length} lessons done`:`${h.t}${h.r?` (${h.r})`:''}`}</small></span>${S.lang===k?'<span class="tick">✓</span>':''}</button>`;
+  }).join('')).join('')
+  + `<div class="lgroup">Coming soon</div>` + SOON.map(s => `<div class="lang soon"><span class="fl">${s[0]}</span><span><b>${s[1]}</b></span></div>`).join('');
+}
+function welcome(){
+  app.innerHTML = `<div class="welcome">${MASCOT('wm')}<h1>Hi, I’m Sayso!</h1>
+    <p class="mut">Which language do you want to learn?</p><div class="langs">${langList()}</div></div>`;
+}
+function pickLang(){
+  overlay(`<h2>Choose a language</h2><p class="mut">XP and streak are shared. Each course keeps its own progress and review deck.</p><div class="langs">${langList()}</div>`);
+}
+function setLang(k){
+  S.lang = k; save(); closeOv(); tab = 'learn'; renderHome();
+  say(COURSES[k].hello); toast(`${COURSES[k].flag} ${COURSES[k].name} it is!`);
+}
+function renderHome(){
+  run = null;
+  if (!COURSES[S.lang]) { welcome(); return; }
+  const due = dueList().length;
+  app.innerHTML = `
+  <header class="top">
+    <div class="logo">${MASCOT()}Sayso</div>
+    <button class="chip" onclick="pickLang()" title="Change language">${course().flag}<span class="lc">${S.lang.toUpperCase()}</span></button>
+    <div class="chip" title="Day streak">🔥 ${shownStreak()}</div>
+    <div class="chip" title="Total XP">⚡ ${S.xp}</div>
+    <button class="ring" onclick="cycleGoal()" title="Daily goal (tap to change)">${ringSvg(Math.min(1,S.today/S.goal))}</button>
+  </header>
+  <main class="scroll">${tab==='learn'?learnView():tab==='review'?reviewView():whyView()}</main>
+  <nav class="tabs">
+    <button class="${tab==='learn'?'on':''}" onclick="tab='learn';renderHome()"><span class="ic">🗺️</span>Learn</button>
+    <button class="${tab==='review'?'on':''}" onclick="tab='review';renderHome()"><span class="ic">🧠</span>Review${due?`<span class="badge">${due}</span>`:''}</button>
+    <button class="${tab==='why'?'on':''}" onclick="tab='why';renderHome()"><span class="ic">✨</span>Why Sayso</button>
+  </nav>`;
+}
+function learnView(){
+  const C = course(), LESSONS = C.lessons;
+  const curIdx = LESSONS.findIndex(l => !S.done.includes(l.key));
+  const pct = Math.min(100, Math.round(S.today/S.goal*100));
+  return `
+  <div class="unit">${MASCOT()}<div><small>${C.flag} ${C.name} · Unit 1</small><h3>${C.unit}</h3></div></div>
+  <div class="goal">🎯 Today<div class="gbar"><i style="width:${pct}%"></i></div>${S.today}/${S.goal} XP</div>
+  <div class="path">
+  ${LESSONS.map((L,i) => {
+    const done = S.done.includes(L.key), cur = i===curIdx;
+    const locked = !done && !cur && !S.unlockAll;
+    const off = Math.round(Math.sin(i*1.25)*72);
+    return `<div class="nodewrap" style="--off:${off}px">
+      <button class="node ${done?'done':''} ${cur?'cur':''} ${locked?'locked':''}" style="--c:${L.color}" onclick="${locked?`toast('🔒 Finish the lesson before this one')`:`openLesson(${i})`}">
+        ${cur?'<span class="start">START</span>':''}${locked?'🔒':L.emoji}
+      </button>
+      <div class="nlabel">${L.title}</div></div>`;
+  }).join('')}
+  </div>
+  <div class="more"><b>🏁 Coming next:</b> <span class="mut">Food & Markets · Travel Trouble · Work Talk</span></div>`;
+}
+function reviewView(){
+  const due = dueList(), all = Object.keys(S.mistakes).filter(id=>ALL[id] && ALL[id].lang===S.lang);
+  return `
+  <div class="card">
+    <h3>🧠 Smart Review</h3>
+    <p class="mut">Every mistake you make becomes a card. Get it right 3 times and it graduates. You never lose a heart here, because there are no hearts.</p>
+    <button class="btn pri" onclick="startReview()">${due.length?`Review ${due.length} weak spot${due.length>1?'s':''}`:'Quick practice mix'}</button>
+  </div>
+  <div class="card">
+    <h3>Your weak spots</h3>
+    ${all.length ? all.map(id => `<div class="weak"><span>${label(ALL[id])}</span><span class="dots">${[0,1,2].map(k=>`<i class="${S.mistakes[id].box>k?'on':''}"></i>`).join('')}</span></div>`).join('')
+      : `<p class="mut">Nothing yet. Go make some mistakes. Seriously, that’s how this works.</p>`}
+  </div>`;
+}
+function whyView(){
+  const row = f => `<div class="feat"><div class="fi">${f[0]}</div><div><b>${f[1]}</b><p>${f[2]}</p></div></div>`;
+  return `
+  <div class="card"><h3>✨ What makes Sayso better</h3>${FEATS.map(row).join('')}</div>
+  <div class="card"><h3>🚀 Roadmap</h3>${ROADMAP.map(row).join('')}</div>
+  <div class="card"><h3>🛠️ Demo controls</h3>
+    <p class="mut">Handy when you’re presenting to judges.</p>
+    <button class="btn ghost" onclick="S.unlockAll=!S.unlockAll;save();renderHome();toast(S.unlockAll?'🔓 All lessons unlocked':'🔒 Lessons locked')">${S.unlockAll?'Lock lessons again':'Unlock all lessons'}</button>
+    <button class="btn ghost" style="color:var(--bad)" onclick="confirmReset()">Reset all progress</button>
+  </div>`;
+}
+function confirmReset(){
+  overlay(`<h2>Reset everything?</h2><p class="mut">XP, streak, completed lessons and review cards will be cleared.</p>
+  <button class="btn bad" onclick="S={xp:0,today:0,todayDate:today(),streak:0,last:'',done:[],mistakes:{},goal:30,unlockAll:false,lang:''};save();closeOv();tab='learn';renderHome();toast('Fresh start ✨')">Reset</button>
+  <button class="btn ghost" onclick="closeOv()">Cancel</button>`);
+}
+function openLesson(i){
+  const L = course().lessons[i];
+  overlay(`<div class="bigem" style="background:${L.color}">${L.emoji}</div><h2>${L.title}</h2>
+  <p class="mut">${L.desc}</p>
+  <div class="pills">${L.words.map(w=>`<span>${TL(w)}</span>`).join('')}</div>
+  <button class="btn pri" onclick="closeOv();startLesson('${L.key}')">Start · up to ${L.ex.length*20} XP</button>
+  <button class="btn ghost" onclick="closeOv()">Not now</button>`);
+}
+
+/* ---------- lesson engine ---------- */
+function prep(e){
+  if(e.t==='build'){
+    e.toks = answerToks(e);
+    e.bank = shuffle([...e.toks, ...(e.extra||[])]);
+  }
+  if(e.t==='match'){ e.left = shuffle(e.pairs.map((_,i)=>i)); e.right = shuffle(e.pairs.map((_,i)=>i)); }
+  if(e.t==='choice'||e.t==='listen') e.order = e.options.map((_,i)=>i);
+  return e;
+}
+function startLesson(id){
+  const L = course().lessons.find(l=>l.key===id);
+  begin(L.ex.map(e=>prep({...e})), L.key, false);
+}
+function startReview(){
+  const ids = dueList(); let q;
+  if (ids.length) q = shuffle(ids).slice(0,10).map(id=>prep({...ALL[id]}));
+  else {
+    let pool = Object.values(ALL).filter(e => e.t!=='convo' && e.lang===S.lang && S.done.includes(e.id.split('-')[0]));
+    if (!pool.length) pool = course().lessons[0].ex.filter(e => e.t!=='convo');
+    q = shuffle(pool).slice(0,8).map(e=>prep({...e}));
+  }
+  begin(q, null, true);
+}
+function begin(queue, lessonId, isReview){
+  run = {queue, i:0, lessonId, isReview, xp:0, combo:0, best:0, right:0, wrong:0, start:Date.now(), retried:new Set(), missed:new Set()};
+  renderEx();
+}
+const cur = () => run.queue[run.i];
+
+function renderEx(){
+  const e = cur();
+  run.sel = e.t==='build' ? [] : null;
+  run.state = 'answer'; run.ok = null;
+  run.m = {left:null, done:new Set(), errs:0};
+  run.c = {turn:0, log:[], miss:false, bad:null, hint:null};
+  app.innerHTML = `<div class="lesson">
+    <div class="lbar"><button class="x" onclick="quit()" aria-label="Quit">✕</button>
+      <div class="prog"><i style="width:${run.i/run.queue.length*100}%"></i></div>
+      ${course().rom?`<button class="romt ${S.rom!==false?'on':''}" onclick="toggleRom(this)" title="Show or hide pronunciation">Aa</button>`:''}
+      <div class="combo ${run.combo>=3?'on':''}">🔥${run.combo}</div></div>
+    <div class="ex" id="ex"></div>
+    <div class="foot" id="foot"></div></div>`;
+  drawEx(); drawFoot();
+  if (e.t==='listen') say(e.say);
+  if (e.t==='convo') say(e.turns[0].npc);
+}
+
+function drawEx(){
+  const e = cur(), box = $('#ex'), done = run.state==='done';
+  let h = '';
+  if (e.t==='choice' || e.t==='listen'){
+    const pics = !!O(e.options[0]).e;
+    if (e.t==='choice'){
+      h += `<h2>${e.prompt}</h2>`;
+      if (e.es) h += `<div class="srcrow">${MASCOT()}<div class="bubble">${TL(e.es)}<button onclick="say(cur().es)" aria-label="Play">🔊</button></div></div>`;
+    } else {
+      h += `<h2>What do you hear?</h2><div class="speak"><button class="big" onclick="say(cur().say)" aria-label="Play">🔊</button><button class="slow" onclick="say(cur().say,1)" aria-label="Play slowly">🐢</button></div>`;
+    }
+    h += `<div class="grid ${pics?'pics':'list'}">${e.order.map(i => {
+      const o = O(e.options[i]);
+      let cls = run.sel===i ? 'sel' : '';
+      if (done){ cls = i===e.answer ? 'right' : (i===run.sel ? 'wrong' : ''); }
+      return `<button class="opt ${cls}" onclick="pick(${i})">${o.e?`<span class="em">${o.e}</span>`:''}<span>${TL(o.w)}</span></button>`;
+    }).join('')}</div>`;
+  }
+  if (e.t==='build'){
+    h += `<h2>Translate this</h2><div class="srcrow">${MASCOT()}<div class="bubble">${e.src}</div></div>
+    <div class="answer ${done?(run.ok?'right':'wrong'):''}">${run.sel.map((bi,k)=>`<button class="tok" onclick="unbuild(${k})">${TL(e.bank[bi])}</button>`).join('')}</div>
+    <div class="bank">${e.bank.map((w,bi)=>`<button class="tok ${run.sel.includes(bi)?'ghost':''}" onclick="build(${bi})">${TL(w)}</button>`).join('')}</div>`;
+  }
+  if (e.t==='match'){
+    h += `<h2>Tap the matching pairs</h2><div class="match">
+      <div>${e.left.map(i=>`<button class="tok mt ${run.m.done.has(i)?'gone':''} ${run.m.left===i?'sel':''}" id="L${i}" onclick="mL(${i})">${TL(e.pairs[i][0])}</button>`).join('')}</div>
+      <div>${e.right.map(i=>`<button class="tok mt ${run.m.done.has(i)?'gone':''}" id="R${i}" onclick="mR(${i})">${e.pairs[i][1]}</button>`).join('')}</div></div>`;
+  }
+  if (e.t==='convo'){
+    const turn = e.turns[run.c.turn];
+    const bub = m => m.who==='me'
+      ? `<div class="b me">${TL(m.es)}</div>`
+      : `<div class="b npc" data-say="${TX(m.es)}" onclick="this.classList.toggle('show')">${TL(m.es)}<button class="sp" onclick="event.stopPropagation();say(this.parentNode.dataset.say)" aria-label="Play">🔊</button><small class="en">${m.en}</small></div>`;
+    h += `<div class="convo-head"><div class="av">${e.npcEmoji}</div><div><b>${e.npc}</b><small>${e.scene}</small></div></div>
+      <div class="tapt">Tap a message to see the translation</div>
+      <div class="chat">${run.c.log.map(bub).join('')}${turn?bub({who:'npc',es:turn.npc,en:turn.en}):''}</div>`;
+    if (turn && !done){
+      h += `<div class="replies">${turn.choices.map((c,k)=>`<button class="opt reply ${run.c.bad===k?'bad':''}" onclick="reply(${k})">${TL(c.es)}</button>`).join('')}</div>`;
+      if (run.c.hint) h += `<div class="hint">💡 ${run.c.hint}</div>`;
+    }
+  }
+  box.innerHTML = h;
+  if (e.t==='convo') box.scrollTop = box.scrollHeight;
+}
+
+function drawFoot(){
+  const e = cur(), f = $('#foot'); f.className = 'foot';
+  if (e.t==='match' || e.t==='convo'){ f.innerHTML = `<button class="btn ghost" onclick="finishEx(false)">Skip</button>`; return; }
+  const can = e.t==='build' ? run.sel.length>0 : run.sel!==null;
+  f.innerHTML = `<button class="btn pri" ${can?'':'disabled'} onclick="check()">Check</button>`;
+}
+
+function pick(i){
+  if (run.state!=='answer') return;
+  run.sel = i; const o = O(cur().options[i]);
+  if (o.e) say(o.w);
+  drawEx(); drawFoot();
+}
+function build(bi){
+  if (run.state!=='answer' || run.sel.includes(bi)) return;
+  run.sel.push(bi); drawEx(); drawFoot();
+}
+function unbuild(k){
+  if (run.state!=='answer') return;
+  run.sel.splice(k,1); drawEx(); drawFoot();
+}
+function mL(i){
+  if (run.m.done.has(i)) return;
+  run.m.left = i; say(cur().pairs[i][0]); drawEx();
+}
+function mR(i){
+  const e = cur();
+  if (run.m.left===null){ toast('Pick a word on the left first 👈'); return; }
+  if (run.m.left===i){
+    run.m.done.add(i); run.m.left = null; tone([784],'sine',0.12); drawEx();
+    if (run.m.done.size===e.pairs.length) setTimeout(()=>finishEx(run.m.errs<2), 250);
+  } else {
+    run.m.errs++; const l = run.m.left; run.m.left = null; tone([220],'triangle',0.1);
+    drawEx();
+    ['L'+l,'R'+i].forEach(id => { const el=document.getElementById(id); if(el){ el.classList.add('err'); setTimeout(()=>el.classList.remove('err'),400);} });
+  }
+}
+function reply(k){
+  const e = cur(), turn = e.turns[run.c.turn], c = turn.choices[k];
+  if (c.ok){
+    run.c.log.push({who:'npc', es:turn.npc, en:turn.en}, {who:'me', es:c.es});
+    run.c.turn++; run.c.bad = null; run.c.hint = null;
+    tone([660],'sine',0.12);
+    if (run.c.turn >= e.turns.length){ drawEx(); setTimeout(()=>finishEx(!run.c.miss), 350); }
+    else { drawEx(); setTimeout(()=>say(e.turns[run.c.turn].npc), 300); }
+  } else {
+    run.c.miss = true; run.c.bad = k; run.c.hint = c.fb; sfx(false); drawEx();
+  }
+}
+function check(){
+  const e = cur(); let ok = false;
+  if (e.t==='choice' || e.t==='listen') ok = run.sel===e.answer;
+  if (e.t==='build'){
+    const got = run.sel.map(b=>norm(TX(e.bank[b]))), want = e.toks.map(t=>norm(TX(t)));
+    ok = got.length===want.length && got.every((w,i)=>w===want[i]);
+  }
+  finishEx(ok);
+}
+function answerText(e){
+  if (e.t==='choice' || e.t==='listen') return TL(O(e.options[e.answer]).w);
+  if (e.t==='build') return TL(buildAnswer(e));
+  return '';
+}
+const PRAISE = ['Nice!','¡Perfecto!','¡Muy bien!','Nailed it!','¡Excelente!','¡Eso es!'];
+function finishEx(ok){
+  const e = cur(); if (run.state==='done') return;
+  run.state = 'done'; run.ok = ok;
+  let gain = 0;
+  if (ok){
+    run.combo++; run.best = Math.max(run.best, run.combo);
+    gain = run.combo>=3 ? 20 : 10; run.xp += gain; run.right++;
+    if (run.isReview) promote(e.id);
+  } else {
+    run.combo = 0; run.wrong++; run.missed.add(e.id); addMistake(e.id);
+    if (e.t!=='convo' && !run.retried.has(e.id)){ run.retried.add(e.id); run.queue.push(prep({...ALL[e.id]})); }
+  }
+  // convo with a slip still counts as a mistake card, but you finished it
+  if (ok && e.t==='convo' && run.c.miss){ addMistake(e.id); }
+  sfx(ok);
+  drawEx();
+  document.querySelector('.prog i').style.width = ((run.i+1)/run.queue.length*100)+'%';
+  const cb = $('.combo'); cb.textContent = '🔥'+run.combo; cb.className = 'combo'+(run.combo>=3?' on':'');
+  const f = $('#foot'); f.className = 'foot '+(ok?'good':'bad');
+  const ans = answerText(e);
+  f.innerHTML = ok
+    ? `<div class="fbt">✅ ${PRAISE[Math.floor(Math.random()*PRAISE.length)]} ${gain>10?'<span class="x2">COMBO ×2 · +20 XP</span>':''}</div>
+       ${e.tip?`<div class="why">💡 ${e.tip}</div>`:''}
+       <button class="btn good" onclick="next()">Continue</button>`
+    : `<div class="fbt">💪 Not quite</div>
+       ${ans?`<p>Correct answer: <b>${ans}</b></p>`:''}
+       ${e.tip?`<div class="why"><b>Why?</b> ${e.tip}</div>`:''}
+       <p class="saved">🧠 Saved to Smart Review. You’ll see this again${e.t!=='convo'?' at the end of the lesson':''}.</p>
+       <button class="btn bad" onclick="next()">Got it</button>`;
+}
+function next(){
+  run.i++;
+  if (run.i >= run.queue.length) finishLesson(); else renderEx();
+}
+function quit(){
+  overlay(`<h2>Leave the lesson?</h2><p class="mut">You’ll lose the XP from this lesson.</p>
+  <button class="btn pri" onclick="closeOv()">Keep learning</button>
+  <button class="btn ghost" style="color:var(--bad)" onclick="closeOv();renderHome()">Quit</button>`);
+}
+function finishLesson(){
+  const before = S.today;
+  S.xp += run.xp; S.today += run.xp; bumpStreak();
+  if (run.lessonId && !S.done.includes(run.lessonId)) S.done.push(run.lessonId);
+  save();
+  const acc = Math.round(100*run.right/Math.max(1, run.right+run.wrong));
+  const secs = Math.round((Date.now()-run.start)/1000);
+  const hit = before < S.goal && S.today >= S.goal;
+  const missed = run.missed.size;
+  app.innerHTML = `<div class="finish">
+    ${MASCOT('m')}
+    <h1>${acc===100?'¡Perfecto!':run.isReview?'Review done!':'Lesson complete!'}</h1>
+    <p class="mut">${hit?'🎯 Daily goal smashed!':S.today>=S.goal?'🎯 Daily goal already done. Overachiever!':`${S.goal-S.today} XP to go for today’s goal`} · 🔥 ${S.streak} day streak</p>
+    <div class="stats">
+      <div class="stat" style="--c:var(--gold)"><b>XP earned</b><span>+${run.xp}</span></div>
+      <div class="stat" style="--c:var(--good)"><b>Accuracy</b><span>${acc}%</span></div>
+      <div class="stat" style="--c:var(--coral)"><b>Best combo</b><span>🔥${run.best}</span></div>
+      <div class="stat" style="--c:var(--vio)"><b>Time</b><span>${Math.floor(secs/60)}:${String(secs%60).padStart(2,'0')}</span></div>
+    </div>
+    ${missed?`<p class="mut" style="margin-bottom:12px">🧠 ${missed} item${missed>1?'s':''} saved to Smart Review</p>`:''}
+    <button class="btn pri" onclick="tab='${missed?'review':'learn'}';renderHome()">Continue</button>
+  </div>`;
+  confetti(); sfxWin();
+}
+
+renderHome();
+try{ speechSynthesis.getVoices(); }catch(e){}
+// installable app + offline lessons (skipped where service workers aren't allowed)
+try{ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{}); }catch(e){}
+</script>
+</body>
+</html>
